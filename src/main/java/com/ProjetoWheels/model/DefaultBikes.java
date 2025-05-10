@@ -1,12 +1,13 @@
 package com.ProjetoWheels.model;
 
+import com.ProjetoWheels.enums.bikes.StatusBikes;
 import lombok.*;
 
 @Getter
 @Setter
 public class DefaultBikes  extends Bikes{
 
-    public DefaultBikes(String modelo, String cor, boolean statusDisponibilidade)
+    public DefaultBikes(String modelo, String cor, StatusBikes statusDisponibilidade)
     {
         super(modelo, cor, statusDisponibilidade);
     }

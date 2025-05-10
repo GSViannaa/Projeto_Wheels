@@ -1,5 +1,6 @@
 package com.ProjetoWheels.model;
 
+import com.ProjetoWheels.enums.bikes.StatusBikes;
 import com.ProjetoWheels.enums.bikes.TipoPneu;
 import lombok.*;
 
@@ -11,7 +12,7 @@ public class MountainBike extends  Bikes {
     private TipoPneu tipoPneu;
 
 
-    public MountainBike(String modelo, String cor, boolean statusDisponibilidade)
+    public MountainBike(String modelo, String cor, StatusBikes statusDisponibilidade, TipoPneu tipoPneu)
     {
         super(modelo, cor, statusDisponibilidade);
     }

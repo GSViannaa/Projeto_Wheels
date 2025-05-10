@@ -1,5 +1,6 @@
 package com.ProjetoWheels.model;
 
+import com.ProjetoWheels.enums.bikes.StatusBikes;
 import lombok.*;
 
 @Getter
@@ -10,7 +11,7 @@ public class ChildrensBikes  extends Bikes
     private boolean temRodinhas;
 
 
-    public ChildrensBikes(String modelo, String cor, boolean statusDisponibilidade)
+    public ChildrensBikes(String modelo, String cor, StatusBikes statusDisponibilidade)
     {
         super(modelo, cor, statusDisponibilidade);
     }

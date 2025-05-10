@@ -14,7 +14,7 @@ public abstract class Bikes
     protected String cor;
     protected StatusBikes statusDisponibilidade;
 
-    public Bikes(String modelo, String cor, boolean statusDisponibilidade)
+    public Bikes(String modelo, String cor, StatusBikes statusDisponibilidade)
     {
         this.modelo = modelo;
         this.cor = cor;
