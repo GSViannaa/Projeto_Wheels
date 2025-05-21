@@ -6,16 +6,17 @@ import java.sql.Statement;
 
 public class DataBaseSetup
 {
-    public static void criartabelas()
+    public static void criarTabelas()
     {
         String sql =
                 """
                  CREATE TABLE IF NOT EXISTS bikes (
                  id INTEGER PRIMARY KEY AUTOINCREMENT,
                  modelo TEXT NOT NULL,
+                 cor TEXT NOT NULL,
                  tipo TEXT NOT NULL,
                  status TEXT NOT NULL,
-                 atributs_especificos TEXT
+                 atributos_especificos TEXT
                  );
                 """;
 

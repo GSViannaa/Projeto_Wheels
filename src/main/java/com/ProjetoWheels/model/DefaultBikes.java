@@ -7,9 +7,14 @@ import lombok.*;
 @Setter
 public class DefaultBikes  extends Bikes{
 
-    public DefaultBikes(String modelo, String cor, StatusBikes statusDisponibilidade)
+    public DefaultBikes(String modelo, String cor)
     {
-        super(modelo, cor, statusDisponibilidade);
+        super(modelo, cor);
+    }
+
+    public DefaultBikes(int id, String modelo, String cor)
+    {
+        super(id, modelo, cor);
     }
 
     @Override

@@ -14,11 +14,17 @@ public class SpeedBikes extends Bikes {
     private TamanhoQuadro tamanhoQuadro;
 
 
-    public SpeedBikes(String modelo, String cor, StatusBikes statusDisponibilidade)
+    public SpeedBikes(String modelo, String cor, StatusBikes statusBikes, TamanhoQuadro tamanhoQuadro)
     {
-        super(modelo, cor, statusDisponibilidade);
+        super(modelo, cor);
+        this.tamanhoQuadro = tamanhoQuadro;
     }
 
+    public SpeedBikes(int id, String modelo, String cor, TamanhoQuadro tamanhoQuadro)
+    {
+        super(id, modelo, cor);
+        this.tamanhoQuadro = tamanhoQuadro;
+    }
     @Override
     public double calcularPreço() {
         return 0;

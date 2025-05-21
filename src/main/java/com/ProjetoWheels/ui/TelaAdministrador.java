@@ -1,5 +1,6 @@
 package com.ProjetoWheels.ui;
 
+import com.ProjetoWheels.DAO.BikesDAO;
 import com.ProjetoWheels.enums.bikes.StatusBikes;
 import com.ProjetoWheels.model.Bikes;
 import com.ProjetoWheels.model.MountainBike;
@@ -18,18 +19,19 @@ public class TelaAdministrador extends JFrame
 
     public  TelaAdministrador()
     {
-        setSize(500,500);
+        setSize(600,500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
         initComponentes();
+        atualizarTabela();
     }
 
     private  void initComponentes()
     {
         setLayout(new BorderLayout());
 
-        String[] colunas = {"ID", "Modelo", "Tipo", "Status"};
+        String[] colunas = {"ID", "Modelo", "Cor", "Tipo", "Status"};
         modelo = new DefaultTableModel(colunas, 0);
         tabela = new JTable(modelo);
         add(new JScrollPane(tabela),BorderLayout.CENTER);
@@ -49,27 +51,22 @@ public class TelaAdministrador extends JFrame
     }
 
     private void atualizarTabela() {
-
+        bikes = BikesDAO.listarBikes();
         modelo.setRowCount(0);
 
         for (Bikes b : bikes)
         {
-            Object[] linha =
+            modelo.addRow(new Object[]
             {
-              b.getId(),
-              b.getModelo(),
-              b.getClass().getSimpleName(),
-              b.getStatusDisponibilidade()
-            };
+             b.getId(),
+             b.getModelo(),
+             b.getCor(),
+             b.getClass().getSimpleName(),
+             b.getStatusDisponibilidade()
+            });
 
-            modelo.addRow(linha);
         }
     }
-    private void adicionarBicicleta() {
 
-        int novoId = bikes.size() + 1;
-        MountainBike nova = new MountainBike("p", "Nova MTB " + novoId, StatusBikes.DISPONIVEL , com.ProjetoWheels.enums.bikes.TipoPneu.MISTO);
-        bikes.add(nova);
-        atualizarTabela();
-    }
+
 }

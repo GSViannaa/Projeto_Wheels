@@ -14,7 +14,14 @@ public class MountainBike extends  Bikes {
 
     public MountainBike(String modelo, String cor, StatusBikes statusDisponibilidade, TipoPneu tipoPneu)
     {
-        super(modelo, cor, statusDisponibilidade);
+        super(modelo, cor);
+        this.tipoPneu = tipoPneu;
+    }
+
+    public MountainBike(int id, String modelo, String cor,  TipoPneu tipoPneu)
+    {
+        super(id, modelo, cor);
+        this.tipoPneu = tipoPneu;
     }
 
     @Override
