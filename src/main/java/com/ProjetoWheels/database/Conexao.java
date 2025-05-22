@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class Conexao
 {
 
-    private static final String URLDataBase = "jdbc:sqlite:wheels.sqlite";
+    private static final String URLDataBase = "jdbc:sqlite:C:\\Users\\gabriel.viana\\Desktop\\Aulas_Java\\Projeto_Wheels\\wheels.sqlite";
 
     public static Connection getConnection() throws SQLException
     {
