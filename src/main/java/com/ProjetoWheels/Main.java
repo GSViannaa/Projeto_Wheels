@@ -23,11 +23,6 @@ public class Main {
         TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
         botsApi.registerBot(new Biketron3000());
 
-        bot.sendText(7965199255L, "Olá, sou o Biketron3000 e estou aqui para ajudá-lo! " +
-                "\nVocê pode usar os comandos abaixo para ajudar no aluguel da sua bike. \n" +
-                "\n/alugar" +
-                "\n/lista");
-
 
     }
 }

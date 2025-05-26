@@ -7,6 +7,8 @@ import lombok.*;
 @Setter
 public class DefaultBikes  extends Bikes{
 
+    private static final double precoFixo = 40.0;
+
     public DefaultBikes(String modelo, String cor)
     {
         super(modelo, cor);
@@ -20,7 +22,7 @@ public class DefaultBikes  extends Bikes{
     @Override
     public double calcularPreço()
     {
-        return 0;
+        return precoFixo;
     }
 
     @Override

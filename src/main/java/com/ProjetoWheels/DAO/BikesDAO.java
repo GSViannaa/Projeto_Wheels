@@ -27,15 +27,15 @@ public class BikesDAO
 
             if(b instanceof MountainBike mountainBike)
             {
-                stmt.setString(5,mountainBike.getTipoPneu().name());
+                stmt.setString(5,mountainBike.getBikeTipoPneu().name());
             }
             else if (b instanceof SpeedBikes speedBike)
             {
-                stmt.setString(5, speedBike.getTamanhoQuadro().name());
+                stmt.setString(5, speedBike.getBikeTamanhoQuadro().name());
             }
             else if (b instanceof ChildrensBikes  childrensBike)
             {
-                stmt.setString(5, childrensBike.getTemRodinhas().name());
+                stmt.setString(5, childrensBike.getBikeTemRodinhas().name());
             }
             else
             {

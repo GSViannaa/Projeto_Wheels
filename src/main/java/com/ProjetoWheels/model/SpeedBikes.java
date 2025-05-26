@@ -10,20 +10,20 @@ import com.ProjetoWheels.enums.bikes.TamanhoQuadro;
 
 public class SpeedBikes extends Bikes {
 
-    private double peso;
-    private TamanhoQuadro tamanhoQuadro;
+    private TamanhoQuadro bikeTamanhoQuadro;
+    private double preco = bikeTamanhoQuadro.getPreco();
 
 
     public SpeedBikes(String modelo, String cor, StatusBikes statusBikes, TamanhoQuadro tamanhoQuadro)
     {
         super(modelo, cor);
-        this.tamanhoQuadro = tamanhoQuadro;
+        this.bikeTamanhoQuadro = tamanhoQuadro;
     }
 
     public SpeedBikes(int id, String modelo, String cor, TamanhoQuadro tamanhoQuadro)
     {
         super(id, modelo, cor);
-        this.tamanhoQuadro = tamanhoQuadro;
+        this.bikeTamanhoQuadro = tamanhoQuadro;
     }
     @Override
     public double calcularPreço() {

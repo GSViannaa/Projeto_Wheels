@@ -9,24 +9,25 @@ import lombok.*;
 
 public class MountainBike extends  Bikes {
 
-    private TipoPneu tipoPneu;
+    private TipoPneu bikeTipoPneu;
+    private double preco = bikeTipoPneu.getPreco();
 
 
     public MountainBike(String modelo, String cor, StatusBikes statusDisponibilidade, TipoPneu tipoPneu)
     {
         super(modelo, cor);
-        this.tipoPneu = tipoPneu;
+        this.bikeTipoPneu = tipoPneu;
     }
 
     public MountainBike(int id, String modelo, String cor,  TipoPneu tipoPneu)
     {
         super(id, modelo, cor);
-        this.tipoPneu = tipoPneu;
+        this.bikeTipoPneu = tipoPneu;
     }
 
     @Override
     public double calcularPreço() {
-        return 0;
+        return preco;
     }
 
     @Override
@@ -36,6 +37,6 @@ public class MountainBike extends  Bikes {
 
     @Override
     public String toString() {
-        return "MountainBike{" + "id=" + id + ", cor=" + cor + ", modelo='" + modelo + '\'' + ", tipoPneu=" + tipoPneu + ", status=" + statusDisponibilidade + '}';
+        return "MountainBike{" + "id=" + id + ", cor=" + cor + ", modelo='" + modelo + '\'' + ", tipoPneu=" + bikeTipoPneu + ", status=" + statusDisponibilidade + '}';
     }
 }
