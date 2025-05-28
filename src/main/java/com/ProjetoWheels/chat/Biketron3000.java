@@ -2,6 +2,7 @@ package com.ProjetoWheels.chat;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -16,33 +17,81 @@ public class Biketron3000 extends TelegramLongPollingBot
     @Override
     public void onUpdateReceived(Update update)
     {
-        var msg = update.getMessage();
-        var user = msg.getFrom();
-        Long chatId = msg.getChatId();
+        if (update.hasMessage() && update.getMessage().hasText()) {
+            var msg = update.getMessage();
+            var user = msg.getFrom();
+            Long chatId = msg.getChatId();
 
-        System.out.println(user.getFirstName() + ": " + msg.getText());
+            System.out.println(user.getFirstName() + ": " + msg.getText());
 
-        SendMessage mensagem = new SendMessage();
-        mensagem.setChatId(chatId.toString());
-        mensagem.setText("Bem-vindo ao Biketron 3000! Clique abaixo para escolher o tipo de bicicleta:");
+            SendMessage mensagem = new SendMessage();
+            mensagem.setChatId(chatId.toString());
+            mensagem.setText("Bem-vindo ao Biketron 3000! \nClique abaixo para escolher o tipo de bicicleta:");
 
-        InlineKeyboardButton botao = new InlineKeyboardButton();
-        botao.setText("Escolher tipos");
-        botao.setCallbackData("ESCOLHER_TIPO");
+            boolean botaoFoiClicado = false;
 
-        InlineKeyboardMarkup teclado = new InlineKeyboardMarkup();
+            InlineKeyboardButton escolherTipos = new InlineKeyboardButton();
+            escolherTipos.setText("Escolher tipos");
+            escolherTipos.setCallbackData("ESCOLHER_TIPO");
 
-        teclado.setKeyboard(List.of(List.of(botao)));
+            InlineKeyboardButton ajuda = new InlineKeyboardButton();
+            ajuda.setText("Ajuda");
+            ajuda.setCallbackData("AJUDA");
 
-        mensagem.setReplyMarkup(teclado);
+            InlineKeyboardMarkup teclado = new InlineKeyboardMarkup();
 
-        try
-        {
-            execute(mensagem);
+            if (update.hasCallbackQuery()) botaoFoiClicado = true;
+            if(botaoFoiClicado) listarTiposBike();
+
+            teclado.setKeyboard(List.of(List.of(escolherTipos), List.of(ajuda)));
+
+            mensagem.setReplyMarkup(teclado);
+
+
+            try {
+                execute(mensagem);
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+            }
         }
-        catch (TelegramApiException e)
-        {
-            e.printStackTrace();
+        else if (update.hasCallbackQuery()) {
+            var callbackQuery = update.getCallbackQuery();
+            var data = callbackQuery.getData(); // ex: "ESCOLHER_TIPO"
+            var chatId = callbackQuery.getMessage().getChatId();
+
+            String resposta;
+
+            switch (data) {
+                case "ESCOLHER_TIPO":
+                    resposta = "Você escolheu ver os tipos de bicicleta!";
+                    break;
+                case "AJUDA":
+                    resposta = """
+                            - Primeiro Passo: Clique em 'Escolher tipos'\n\
+                            
+                            - Segundo passo: Selecione o tipo de bicicleta\n\
+                            
+                            - Terceiro passo: Escolha a bicicleta\n\
+                            
+                            - Quarto passo: Estabeleça o período do aluguel\n\
+                            
+                            - Quinto passo: Defina o método de pagamento\n\
+                            
+                            """;
+                    break;
+                default:
+                    resposta = "Opção desconhecida.";
+            }
+
+            SendMessage respostaMsg = new SendMessage();
+            respostaMsg.setChatId(chatId.toString());
+            respostaMsg.setText(resposta);
+
+            try {
+                execute(respostaMsg);
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+            }
         }
     }
     @Override
@@ -69,5 +118,21 @@ public class Biketron3000 extends TelegramLongPollingBot
             throw new RuntimeException(e);
         }
     }
+    public void listarTiposBike(){
+        InlineKeyboardButton defaultBike = new InlineKeyboardButton();
+        defaultBike.setText("Bicicleta Urbana");
+        defaultBike.setCallbackData("DEFAULT_BIKE");
 
+        InlineKeyboardButton mountainBike = new InlineKeyboardButton();
+        mountainBike.setText("Mountain Bike");
+        mountainBike.setCallbackData("MOUNTAIN_BIKE");
+
+        InlineKeyboardButton speedBike = new InlineKeyboardButton();
+        speedBike.setText("Speed Bike");
+        speedBike.setCallbackData("SPEED_BIKE");
+
+        InlineKeyboardButton childrensBike = new InlineKeyboardButton();
+        childrensBike.setText("Bicicleta Infantil");
+        childrensBike.setCallbackData("CHILDRENS_BIKE");
+    }
 }
