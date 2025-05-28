@@ -1,5 +1,6 @@
 package com.ProjetoWheels.model;
 
+import com.ProjetoWheels.enums.bikes.StatusBikes;
 import com.ProjetoWheels.enums.bikes.TemRodinhas;
 import lombok.*;
 
@@ -9,13 +10,14 @@ import lombok.*;
 public class ChildrensBikes extends Bikes
 {
     private TemRodinhas bikeTemRodinhas;
-    private double preco = bikeTemRodinhas.getPreco();
+    private double preco;
 
 
-    public ChildrensBikes(String modelo, String cor,  TemRodinhas temRodinhas)
+    public ChildrensBikes(String modelo, String cor, StatusBikes statusDisponibilidade, TemRodinhas temRodinhas)
     {
         super(modelo, cor);
         this.bikeTemRodinhas = temRodinhas;
+        preco = bikeTemRodinhas.getPreco();
     }
 
     public ChildrensBikes(int id, String modelo, String cor, TemRodinhas temRodinhas)

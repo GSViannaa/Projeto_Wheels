@@ -9,7 +9,7 @@ public class DefaultBikes  extends Bikes{
 
     private static final double precoFixo = 40.0;
 
-    public DefaultBikes(String modelo, String cor)
+    public DefaultBikes(String modelo, String cor,  StatusBikes statusDisponibilidade)
     {
         super(modelo, cor);
     }

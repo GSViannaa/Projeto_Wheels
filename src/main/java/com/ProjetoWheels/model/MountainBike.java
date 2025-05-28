@@ -10,13 +10,14 @@ import lombok.*;
 public class MountainBike extends  Bikes {
 
     private TipoPneu bikeTipoPneu;
-    private double preco = bikeTipoPneu.getPreco();
+    private double preco;
 
 
     public MountainBike(String modelo, String cor, StatusBikes statusDisponibilidade, TipoPneu tipoPneu)
     {
         super(modelo, cor);
         this.bikeTipoPneu = tipoPneu;
+        preco = bikeTipoPneu.getPreco();
     }
 
     public MountainBike(int id, String modelo, String cor,  TipoPneu tipoPneu)

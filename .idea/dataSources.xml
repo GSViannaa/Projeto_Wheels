@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="wheels" uuid="be58e81a-b288-4a40-94dd-53094b5f4bb9">
+    <data-source source="LOCAL" name="wheels" uuid="7a31a87e-4a6a-4048-8250-a8aa026e8fc0">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:C:\Users\bernardo.cytryn\IdeaProjects\Projeto_Wheels\wheels.sqlite</jdbc-url>
+      <jdbc-url>jdbc:sqlite:C:\Users\gabri\OneDrive\Área de Trabalho\Trabalhos_Java\Projeto_Wheels\wheels.sqlite</jdbc-url>
       <jdbc-additional-properties>
         <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />
       </jdbc-additional-properties>

@@ -11,13 +11,14 @@ import com.ProjetoWheels.enums.bikes.TamanhoQuadro;
 public class SpeedBikes extends Bikes {
 
     private TamanhoQuadro bikeTamanhoQuadro;
-    private double preco = bikeTamanhoQuadro.getPreco();
+    private double preco;
 
 
     public SpeedBikes(String modelo, String cor, StatusBikes statusBikes, TamanhoQuadro tamanhoQuadro)
     {
         super(modelo, cor);
         this.bikeTamanhoQuadro = tamanhoQuadro;
+        this.preco =  bikeTamanhoQuadro.getPreco();
     }
 
     public SpeedBikes(int id, String modelo, String cor, TamanhoQuadro tamanhoQuadro)

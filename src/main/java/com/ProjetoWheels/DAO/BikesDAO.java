@@ -110,4 +110,62 @@ public class BikesDAO
         return listaBikes;
 
     }
+    public static List<Bikes> ListarBikesPorTipo(String tipo)
+    {
+        List<Bikes> listaBikes = new ArrayList<>();
+
+        String sql = "SELECT * FROM bikes WHERE tipo = ?";
+
+        try(Connection conn = Conexao.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+        ){
+            stmt.setString(1,tipo);
+            ResultSet rs = stmt.executeQuery();
+
+            while(rs.next())
+            {
+                int id = rs.getInt("id");
+                String modelo = rs.getString("modelo");
+                String cor = rs.getString("cor");
+                String atributo = rs.getString("atributos_especificos");
+                String statusStr = rs.getString("status");
+
+                StatusBikes status = StatusBikes.valueOf(statusStr);
+
+                Bikes bike = null;
+
+                if ("MountainBike".equalsIgnoreCase(tipo))
+                {
+                    bike = new MountainBike(id, modelo, cor, TipoPneu.valueOf(atributo));
+                }
+                else if ("SpeedBikes".equalsIgnoreCase(tipo))
+                {
+                    bike = new SpeedBikes(id, modelo, cor, TamanhoQuadro.valueOf(atributo));
+                }
+                else if ("ChildrensBikes".equalsIgnoreCase(tipo))
+                {
+                    bike = new ChildrensBikes(id, modelo, cor, TemRodinhas.valueOf(atributo));
+                }
+                else
+                {
+                    bike = new DefaultBikes(id, modelo, cor);
+                }
+
+                if(bike != null)
+                {
+                    bike.setStatusDisponibilidade(status);
+                    listaBikes.add(bike);
+                }
+            }
+
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+            throw new RuntimeException("Erro ao listar bicicletas: " + e.getMessage());
+        }
+
+        return listaBikes;
+
+    }
 }
