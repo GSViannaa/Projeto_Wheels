@@ -15,7 +15,7 @@ public class Main {
     public static void main(String[] args) throws TelegramApiException
     {
         DataBaseSetup.criarTabelas();
-        //PopularTabelaDAO.popularTabela();
+        PopularTabelaDAO.popularTabela();
         SwingUtilities.invokeLater(() -> new TelaAdministrador().setVisible(true));
 
         Biketron3000 bot = new Biketron3000();
