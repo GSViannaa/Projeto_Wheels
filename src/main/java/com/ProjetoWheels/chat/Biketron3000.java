@@ -1,4 +1,5 @@
 package com.ProjetoWheels.chat;
+import com.ProjetoWheels.DAO.BikesDAO;
 import com.ProjetoWheels.model.Bikes;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -12,11 +13,34 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.ProjetoWheels.DAO.BikesDAO.ListarBikesPorTipo;
 
 public class Biketron3000 extends TelegramLongPollingBot
 {
 
+    @Override
+    public String getBotToken() {
+        return "7880913189:AAHrZgQYS6r_pvh-APAQZXE8V26aEATdLmw";
+    }
+
+    @Override
+    public String getBotUsername() {
+        return "Biketron3000";
+    }
+
+    public void sendText(Long who, String what)
+    {
+        SendMessage sm = SendMessage.builder()
+                .chatId(who.toString())
+                .text(what).build();
+        try
+        {
+            execute(sm);
+        }
+        catch (TelegramApiException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
     @Override
     public void onUpdateReceived(Update update)
     {
@@ -43,9 +67,24 @@ public class Biketron3000 extends TelegramLongPollingBot
         String data = callbackQuery.getData();
         Long chatId = callbackQuery.getMessage().getChatId();
 
+        if (data.startsWith("ESCOLHER_MODELO_"))
+        {
+            String modeloEscolhido = data.replace("ESCOLHER_MODELO_", "");
+            enviarMensagemSimples(chatId, "Você escolheu o modelo: " + modeloEscolhido);
+
+            return;
+        }
+
         switch (data) {
             case "ESCOLHER_TIPO":
                 enviarMensagemDeEscolhaTipo(chatId);
+                break;
+
+
+            case "MountainBikes":
+            case "SpeedBikes":
+            case "DefaultBikes":
+            case "ChildrensBikes":
                 enviarBikesPorTipo(chatId, data);
                 break;
 
@@ -67,15 +106,30 @@ public class Biketron3000 extends TelegramLongPollingBot
         mensagem.setReplyMarkup(criarTecladoTiposDeBike());
         enviarMensagem(mensagem);
     }
-
     private void enviarBikesPorTipo(Long chatId, String tipo)
     {
-        List<String> bikes = retornarBikesPortipo(tipo);
-        StringBuilder sb = new StringBuilder("Bicicletas disponíveis:\n");
-        for (String bike : bikes) {
-            sb.append("- ").append(bike).append("\n");
+        List<String> modelos = retornarBikesPortipo(tipo);
+
+        SendMessage mensagem = new SendMessage();
+        mensagem.setChatId(chatId.toString());
+        mensagem.setText("Escolha uma bicicleta:");
+
+        List<List<InlineKeyboardButton>> linhas = new ArrayList<>();
+
+        for (String modelo : modelos)
+        {
+            InlineKeyboardButton botao = new InlineKeyboardButton();
+            botao.setText(modelo);
+            botao.setCallbackData("ESCOLHER_MODELO_" + modelo);
+
+            linhas.add(List.of(botao));
         }
-        enviarMensagemSimples(chatId, sb.toString());
+
+        InlineKeyboardMarkup teclado = new InlineKeyboardMarkup();
+        teclado.setKeyboard(linhas);
+        mensagem.setReplyMarkup(teclado);
+
+        enviarMensagem(mensagem);
     }
 
     private void enviarMensagemSimples(Long chatId, String texto)
@@ -88,14 +142,15 @@ public class Biketron3000 extends TelegramLongPollingBot
 
     private void enviarMensagem(SendMessage mensagem)
     {
-        try {
+        try
+        {
             execute(mensagem);
-        } catch (TelegramApiException e) {
+        }
+        catch (TelegramApiException e)
+        {
             e.printStackTrace();
         }
     }
-
-
 
     private static SendMessage mensagemInicial(Long chatId)
     {
@@ -121,30 +176,7 @@ public class Biketron3000 extends TelegramLongPollingBot
         return mensagem;
     }
 
-    @Override
-    public String getBotToken() {
-        return "7880913189:AAHrZgQYS6r_pvh-APAQZXE8V26aEATdLmw";
-    }
 
-    @Override
-    public String getBotUsername() {
-        return "Biketron3000";
-    }
-
-    public void sendText(Long who, String what)
-    {
-        SendMessage sm = SendMessage.builder()
-                .chatId(who.toString())
-                .text(what).build();
-        try
-        {
-            execute(sm);
-        }
-        catch (TelegramApiException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
     public InlineKeyboardMarkup criarTecladoTiposDeBike()
     {
         InlineKeyboardMarkup tecladoTipos = new InlineKeyboardMarkup();
@@ -188,16 +220,15 @@ public class Biketron3000 extends TelegramLongPollingBot
 
     public List<String> retornarBikesPortipo(String callback)
     {
-        List<Bikes> bikesFiltradas;
-        List<String> bikesToSring = new ArrayList();
+        List<Bikes> bikesFiltradas = BikesDAO.ListarBikesPorTipo(callback);
+        List<String> modelo = new ArrayList();
 
-        bikesFiltradas = ListarBikesPorTipo(callback);
 
         for (Bikes bike: bikesFiltradas)
         {
-           bikesToSring.add(bike.getModelo());
+           modelo.add(bike.getModelo());
         }
-        return bikesToSring;
+        return modelo;
     }
 
 
