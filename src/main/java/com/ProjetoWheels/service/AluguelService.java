@@ -1,6 +1,7 @@
 package com.ProjetoWheels.service;
 
 import com.ProjetoWheels.model.Bikes;
+import com.ProjetoWheels.model.Cliente;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,7 +16,7 @@ import java.util.List;
 public class AluguelService
 {
     private List<Bikes> listaBikes;
-    private String emailUsuario;
+    private Cliente cliente;
     private LocalDate dataInicio;
     private LocalDate dataFim;
 
