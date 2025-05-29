@@ -25,9 +25,9 @@ public class BikesDAO
             stmt.setString(3, b.getClass().getSimpleName());
             stmt.setString(4, b.getStatusDisponibilidade().name());
 
-            if(b instanceof MountainBike mountainBike)
+            if(b instanceof MountainBikes mountainBikes)
             {
-                stmt.setString(5,mountainBike.getBikeTipoPneu().name());
+                stmt.setString(5, mountainBikes.getBikeTipoPneu().name());
             }
             else if (b instanceof SpeedBikes speedBike)
             {
@@ -77,7 +77,7 @@ public class BikesDAO
 
                 if ("MountainBike".equalsIgnoreCase(tipo))
                 {
-                    bike = new MountainBike(id, modelo, cor, TipoPneu.valueOf(atributo));
+                    bike = new MountainBikes(id, modelo, cor, TipoPneu.valueOf(atributo));
                 }
                 else if ("SpeedBikes".equalsIgnoreCase(tipo))
                 {
@@ -134,9 +134,9 @@ public class BikesDAO
 
                 Bikes bike = null;
 
-                if ("MountainBike".equalsIgnoreCase(tipo))
+                if ("MountainBikes".equalsIgnoreCase(tipo))
                 {
-                    bike = new MountainBike(id, modelo, cor, TipoPneu.valueOf(atributo));
+                    bike = new MountainBikes(id, modelo, cor, TipoPneu.valueOf(atributo));
                 }
                 else if ("SpeedBikes".equalsIgnoreCase(tipo))
                 {

@@ -6,22 +6,20 @@ import com.ProjetoWheels.enums.bikes.TemRodinhas;
 import com.ProjetoWheels.enums.bikes.TipoPneu;
 import com.ProjetoWheels.model.ChildrensBikes;
 import com.ProjetoWheels.model.DefaultBikes;
-import com.ProjetoWheels.model.MountainBike;
+import com.ProjetoWheels.model.MountainBikes;
 import com.ProjetoWheels.model.SpeedBikes;
 
 public class PopularTabelaDAO
 {
     public static void popularTabela()
     {
-        MountainBike mtb0 = new MountainBike( "Caloi Explorer", "Preta", StatusBikes.DISPONIVEL, TipoPneu.CRAVADO);
+        MountainBikes mtb0 = new MountainBikes( "Caloi Explorer", "Preta", StatusBikes.DISPONIVEL, TipoPneu.CRAVADO);
         BikesDAO.salvarNoBancoDeDados(mtb0);
-        System.out.println("MountainBike salva com sucesso!");
 
         SpeedBikes speed0 = new SpeedBikes( "Specialized Tarmac", "Azul",StatusBikes.DISPONIVEL, TamanhoQuadro.M);
         BikesDAO.salvarNoBancoDeDados(speed0);
-        System.out.println("SpeedBike salva com sucesso!");
 
-        MountainBike mtb1 = new MountainBike("Caloi Explorer", "Preta", StatusBikes.DISPONIVEL, TipoPneu.CRAVADO);
+        MountainBikes mtb1 = new MountainBikes("Caloi Explorer", "Preta", StatusBikes.DISPONIVEL, TipoPneu.CRAVADO);
         BikesDAO.salvarNoBancoDeDados(mtb1);
 
 
@@ -37,7 +35,7 @@ public class PopularTabelaDAO
         BikesDAO.salvarNoBancoDeDados(kids1);
 
 
-        MountainBike mtb2 = new MountainBike("Scott Scale", "Verde", StatusBikes.ALUGADA, TipoPneu.FATTIRE);
+        MountainBikes mtb2 = new MountainBikes("Scott Scale", "Verde", StatusBikes.ALUGADA, TipoPneu.FATTIRE);
         BikesDAO.salvarNoBancoDeDados(mtb2);
 
 
@@ -53,7 +51,7 @@ public class PopularTabelaDAO
         BikesDAO.salvarNoBancoDeDados(kids2);
 
 
-        MountainBike mtb3 = new MountainBike("Trek Marlin", "Preto e Azul", StatusBikes.COM_DEFEITO, TipoPneu.LISO);
+        MountainBikes mtb3 = new MountainBikes("Trek Marlin", "Preto e Azul", StatusBikes.COM_DEFEITO, TipoPneu.LISO);
         BikesDAO.salvarNoBancoDeDados(mtb3);
 
 

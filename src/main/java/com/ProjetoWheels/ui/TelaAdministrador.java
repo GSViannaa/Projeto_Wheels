@@ -1,9 +1,7 @@
 package com.ProjetoWheels.ui;
 
 import com.ProjetoWheels.DAO.BikesDAO;
-import com.ProjetoWheels.enums.bikes.StatusBikes;
 import com.ProjetoWheels.model.Bikes;
-import com.ProjetoWheels.model.MountainBike;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

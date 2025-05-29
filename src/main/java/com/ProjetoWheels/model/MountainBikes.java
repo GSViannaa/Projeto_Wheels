@@ -7,20 +7,20 @@ import lombok.*;
 @Getter
 @Setter
 
-public class MountainBike extends  Bikes {
+public class MountainBikes extends  Bikes {
 
     private TipoPneu bikeTipoPneu;
     private double preco;
 
 
-    public MountainBike(String modelo, String cor, StatusBikes statusDisponibilidade, TipoPneu tipoPneu)
+    public MountainBikes(String modelo, String cor, StatusBikes statusDisponibilidade, TipoPneu tipoPneu)
     {
         super(modelo, cor);
         this.bikeTipoPneu = tipoPneu;
         preco = bikeTipoPneu.getPreco();
     }
 
-    public MountainBike(int id, String modelo, String cor,  TipoPneu tipoPneu)
+    public MountainBikes(int id, String modelo, String cor, TipoPneu tipoPneu)
     {
         super(id, modelo, cor);
         this.bikeTipoPneu = tipoPneu;
