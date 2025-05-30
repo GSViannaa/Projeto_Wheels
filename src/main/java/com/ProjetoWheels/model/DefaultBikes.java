@@ -20,7 +20,7 @@ public class DefaultBikes  extends Bikes{
     }
 
     @Override
-    public double calcularPreço()
+    public double calcularPreco()
     {
         return precoFixo;
     }

@@ -13,7 +13,6 @@ public class SpeedBikes extends Bikes {
     private TamanhoQuadro bikeTamanhoQuadro;
     private double preco;
 
-
     public SpeedBikes(String modelo, String cor, StatusBikes statusBikes, TamanhoQuadro tamanhoQuadro)
     {
         super(modelo, cor);
@@ -27,7 +26,7 @@ public class SpeedBikes extends Bikes {
         this.bikeTamanhoQuadro = tamanhoQuadro;
     }
     @Override
-    public double calcularPreço() {
+    public double calcularPreco() {
         return 0;
     }
 

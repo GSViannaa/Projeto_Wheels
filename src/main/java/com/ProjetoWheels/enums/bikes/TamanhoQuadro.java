@@ -2,7 +2,6 @@ package com.ProjetoWheels.enums.bikes;
 
 public enum TamanhoQuadro
 {
-
     XS(45.0),  // Extra pequeno (geralmente 47-49 cm)
     S(50.0),   // Pequeno (50-52 cm)
     M(55.0),   // Médio (53-55 cm)

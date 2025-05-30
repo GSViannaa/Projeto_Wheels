@@ -50,7 +50,6 @@ public class BikesDAO
             throw new RuntimeException("Erro ao salvar bicicleta no banco de dados: " + e.getMessage());
         }
 
-
     }
     public static List<Bikes> listarBikes()
     {
@@ -98,8 +97,6 @@ public class BikesDAO
                     listaBikes.add(bike);
                 }
             }
-
-
         }
         catch (SQLException e)
         {
@@ -108,8 +105,8 @@ public class BikesDAO
         }
 
         return listaBikes;
-
     }
+
     public static List<Bikes> ListarBikesPorTipo(String tipo)
     {
         List<Bikes> listaBikes = new ArrayList<>();
@@ -157,7 +154,6 @@ public class BikesDAO
                     listaBikes.add(bike);
                 }
             }
-
         }
         catch (SQLException e)
         {
@@ -166,6 +162,5 @@ public class BikesDAO
         }
 
         return listaBikes;
-
     }
 }

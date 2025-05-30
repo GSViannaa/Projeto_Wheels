@@ -31,7 +31,7 @@ public class AluguelService
 
         for(Bikes b : listaBikes)
         {
-            total += b.calcularPreço();
+            total += b.calcularPreco();
         }
 
         return total;

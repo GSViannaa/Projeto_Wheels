@@ -31,5 +31,4 @@ public class DataBaseSetup
             System.err.println("Erro ao criar tabela: " + e.getMessage());
         }
     }
-
 }

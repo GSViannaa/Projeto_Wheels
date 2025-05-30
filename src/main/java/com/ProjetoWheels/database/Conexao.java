@@ -13,6 +13,4 @@ public class Conexao
     {
         return DriverManager.getConnection(URLDataBase);
     }
-
-
 }

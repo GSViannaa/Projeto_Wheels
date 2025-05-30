@@ -12,7 +12,6 @@ public class ChildrensBikes extends Bikes
     private TemRodinhas bikeTemRodinhas;
     private double preco;
 
-
     public ChildrensBikes(String modelo, String cor, StatusBikes statusDisponibilidade, TemRodinhas temRodinhas)
     {
         super(modelo, cor);
@@ -26,9 +25,8 @@ public class ChildrensBikes extends Bikes
         this.bikeTemRodinhas = temRodinhas;
     }
 
-
     @Override
-    public double calcularPreço()
+    public double calcularPreco()
     {
         return preco;
     }

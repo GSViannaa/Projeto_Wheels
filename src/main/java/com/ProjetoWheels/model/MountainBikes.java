@@ -12,7 +12,6 @@ public class MountainBikes extends  Bikes {
     private TipoPneu bikeTipoPneu;
     private double preco;
 
-
     public MountainBikes(String modelo, String cor, StatusBikes statusDisponibilidade, TipoPneu tipoPneu)
     {
         super(modelo, cor);
@@ -27,7 +26,7 @@ public class MountainBikes extends  Bikes {
     }
 
     @Override
-    public double calcularPreço() {
+    public double calcularPreco() {
         return preco;
     }
 

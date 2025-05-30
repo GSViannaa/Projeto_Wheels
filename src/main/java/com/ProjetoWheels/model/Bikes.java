@@ -26,10 +26,6 @@ public abstract class Bikes
         this.cor = cor;
 
     }
-
-
-
-    public abstract double calcularPreço();
+    public abstract double calcularPreco();
     public abstract boolean verificarStatusDisponibilidade();
-
 }

@@ -5,5 +5,4 @@ public class Cliente
     String email;
     String nomeCompleto;
     String cpf;
-
 }
