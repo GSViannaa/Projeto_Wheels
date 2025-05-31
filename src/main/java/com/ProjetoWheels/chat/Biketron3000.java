@@ -135,11 +135,11 @@ public class Biketron3000 extends TelegramLongPollingBot
     private  InlineKeyboardMarkup menuReumoDaBike(String modelo, String tipo)
     {
         InlineKeyboardButton botaoConfirmar = new InlineKeyboardButton();
-        botaoConfirmar.setText("✅ Confirmar");
+        botaoConfirmar.setText("Confirmar");
         botaoConfirmar.setCallbackData("CONFIRMAR_MODELO" + modelo);
 
         InlineKeyboardButton botaoVoltar = new InlineKeyboardButton();
-        botaoVoltar.setText("🔙 Voltar");
+        botaoVoltar.setText("Voltar");
         botaoVoltar.setCallbackData("ESCOLHER_TIPO" + tipo);
 
         List<List<InlineKeyboardButton>> linhas = List.of(List.of(botaoConfirmar), List.of(botaoVoltar));
