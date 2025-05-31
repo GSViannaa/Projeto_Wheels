@@ -46,7 +46,7 @@ public class Biketron3000 extends TelegramLongPollingBot
     {
         if (update.hasMessage())
         {
-            processarMensagem(update.getMessage());
+            processarMensagemDeTexto(update.getMessage());
         }
 
         if (update.hasCallbackQuery())
@@ -54,84 +54,125 @@ public class Biketron3000 extends TelegramLongPollingBot
             processarCallback(update.getCallbackQuery());
         }
     }
+      // =============================
+     //  Processamento  mensagem
+    // =============================
 
-    private void processarMensagem(Message msg)
+    private void processarMensagemDeTexto(Message msg)
     {
         Long chatId = msg.getChatId();
-        SendMessage mensagem = mensagemInicial(chatId);
+        SendMessage mensagem = criarMensagemInicial(chatId);
         enviarMensagem(mensagem);
     }
+
+     // =============================
+    //  Processamento  callback
+   // =============================
 
     private void processarCallback(CallbackQuery callbackQuery)
     {
         String data = callbackQuery.getData();
         Long chatId = callbackQuery.getMessage().getChatId();
 
-        if (data.startsWith("ESCOLHER_MODELO_"))
+
+         if (data.equals("ESCOLHER_TIPO"))
         {
-            String modeloEscolhido = data.replace("ESCOLHER_MODELO_", "");
-            enviarMensagemSimples(chatId, "Você escolheu o modelo: " + modeloEscolhido);
+            enviarMenuTiposDeBike(chatId);
         }
-        if(data.equals("ESCOLHER_TIPO"))
+        else if (data.startsWith("ESCOLHER_MODELO_"))
         {
-            enviarMensagemDeEscolhaTipo(chatId);
+            processarEscolhaDeModelo(chatId, data);
         }
-        else if(data.equals("MountainBikes") || data.equals("SpeedBikes")
-                || data.equals("DefaultBikes") || data.equals("ChildrensBikes"))
+        else if (isTipoDeBike(data))
         {
-            enviarBikesPorTipo(chatId, data);
+            enviarMenuModelosDeBike(chatId, data);
         }
-        else if(data.startsWith("ESCOLHER_MODELO_"))
-        {
-            detalharBikes( chatId, data);
-        }
-        else if(data.equals("AJUDA"))
-        {
-            String respostaAjuda = caseBotaoAjudaFoiClicado();
+        else if (data.equals("AJUDA")) {
+            String respostaAjuda = gerarMensagemAjuda();
             enviarMensagemSimples(chatId, respostaAjuda);
         }
-        else
-        {
+        else {
             enviarMensagemSimples(chatId, "Opção desconhecida.");
         }
-//        switch (data) {
-//            case "ESCOLHER_TIPO":
-//                enviarMensagemDeEscolhaTipo(chatId);
-//                break;
-//
-//
-//            case "MountainBikes":
-//            case "SpeedBikes":
-//            case "DefaultBikes":
-//            case "ChildrensBikes":
-//                enviarBikesPorTipo(chatId, data);
-//                break;
-//
-//
-//
-//            case "AJUDA":
-//                String respostaAjuda = caseBotaoAjudaFoiClicado();
-//                enviarMensagemSimples(chatId, respostaAjuda);
-//                break;
-//
-//            default:
-//                enviarMensagemSimples(chatId, "Opção desconhecida.");
-//        }
+
     }
-    private void detalharBikes(Long id, String modelo)
+
+     // =============================
+    //  Lógica tipos de bikes
+   // =============================
+    private boolean isTipoDeBike(String data)
     {
-        int posicao = modelo.lastIndexOf("_");
-
-        String resultado = "";
-
-        if(posicao != -1)
-        {
-            resultado = modelo.substring(posicao + 1);
-            enviarMensagemSimples(id, resultado);
-        }
+        return data.contains("MountainBikes") || data.equals("SpeedBikes") || data.equals("DefaultBikes") || data.equals("ChildrensBikes");
     }
 
-    private void enviarMensagemDeEscolhaTipo(Long chatId)
+    // =============================
+   //  Processar escolha de modelos
+  // =============================
+    private void processarEscolhaDeModelo(Long chatId, String data)
+    {
+        String modelo = data.replace("ESCOLHER_MODELO_", "");
+
+        List<Bikes> bikes = retornarDetalhesDoModelo(modelo);
+
+        String textoMensagem = mensagemDetalhesModeloEscolhido(bikes);
+        String tipoDaBike = bikes.isEmpty() ? "" : bikes.get(0).getClass().getSimpleName();
+
+        SendMessage mensagem = new SendMessage();
+        mensagem.setChatId(chatId.toString());
+        mensagem.setText(textoMensagem);
+        mensagem.enableMarkdown(true);
+
+        InlineKeyboardMarkup teclado = menuReumoDaBike(modelo, tipoDaBike);
+        mensagem.setReplyMarkup(teclado);
+
+        enviarMensagem(mensagem);
+
+    }
+    // =============================
+   //  Menus e mensagens
+  // =============================
+
+    private  InlineKeyboardMarkup menuReumoDaBike(String modelo, String tipo)
+    {
+        InlineKeyboardButton botaoConfirmar = new InlineKeyboardButton();
+        botaoConfirmar.setText("✅ Confirmar");
+        botaoConfirmar.setCallbackData("CONFIRMAR_MODELO" + modelo);
+
+        InlineKeyboardButton botaoVoltar = new InlineKeyboardButton();
+        botaoVoltar.setText("🔙 Voltar");
+        botaoVoltar.setCallbackData("ESCOLHER_TIPO" + tipo);
+
+        List<List<InlineKeyboardButton>> linhas = List.of(List.of(botaoConfirmar), List.of(botaoVoltar));
+        InlineKeyboardMarkup teclado = new InlineKeyboardMarkup();
+        teclado.setKeyboard(linhas);
+
+        return teclado;
+    }
+
+    private String mensagemDetalhesModeloEscolhido(List<Bikes> listaBikes)
+    {
+        if (listaBikes.isEmpty()) return "Nenhuma bicicleta desse modelo disponível no momento";
+
+        Bikes primeiraBike = listaBikes.get(0);
+        String modelo = primeiraBike.getModelo();
+        String cor = primeiraBike.getCor();
+        double preco = primeiraBike.calcularPreco();
+
+        int quantidadeDisponivel = listaBikes.size();
+
+        return String.format("""
+            *Informações do Modelo:*
+            • Modelo: %s
+            • Cor: %s
+            • Preço por dia: R$ %.2f
+            • Quantidade disponível: %d
+            """,
+                modelo, cor, preco, quantidadeDisponivel
+        );
+    }
+
+
+    private void enviarMenuTiposDeBike(Long chatId)
     {
         SendMessage mensagem = new SendMessage();
         mensagem.setChatId(chatId.toString());
@@ -139,7 +180,8 @@ public class Biketron3000 extends TelegramLongPollingBot
         mensagem.setReplyMarkup(criarTecladoTiposDeBike());
         enviarMensagem(mensagem);
     }
-    private void enviarBikesPorTipo(Long chatId, String tipo)
+
+    private void enviarMenuModelosDeBike(Long chatId, String tipo)
     {
         List<String> modelos = retornarBikesPortipo(tipo);
 
@@ -184,8 +226,11 @@ public class Biketron3000 extends TelegramLongPollingBot
             e.printStackTrace();
         }
     }
+    // =============================
+   //  Mensagem inicial
+  // =============================
 
-    private static SendMessage mensagemInicial(Long chatId)
+    private static SendMessage criarMensagemInicial(Long chatId)
     {
         SendMessage mensagem = new SendMessage();
         mensagem.setChatId(chatId.toString());
@@ -206,6 +251,9 @@ public class Biketron3000 extends TelegramLongPollingBot
         mensagem.setReplyMarkup(teclado);
         return mensagem;
     }
+    // =============================
+   //  Teclado tipos de bike
+  // =============================
 
     public InlineKeyboardMarkup criarTecladoTiposDeBike()
     {
@@ -232,20 +280,27 @@ public class Biketron3000 extends TelegramLongPollingBot
         return tecladoTipos;
     }
 
-    public String caseBotaoAjudaFoiClicado()
+    // =============================
+   //  Mensagem de ajuda
+  // =============================
+
+    public String gerarMensagemAjuda()
     {
         return  """
-                     1- Clique em 'Escolher tipos'\n
-                     2- Selecione o tipo de bicicleta\n
-                     3- Escolha a bicicleta\n
-                     4- Estabeleça o período do aluguel\n
-                     5- Defina o método de pagamento\n
+                1️⃣ Clique em 'Escolher tipos'
+                2️⃣ Selecione o tipo de bicicleta
+                3️⃣ Escolha a bicicleta
+                4️⃣ Estabeleça o período do aluguel
+                5️⃣ Defina o método de pagamento
                      """;
     }
+    // =============================
+   //  Acesso ao SQL
+  // =============================
 
-    public List<String> retornarBikesPortipo(String callback)
+    public List<String> retornarBikesPortipo(String data)
     {
-        List<Bikes> bikesFiltradas = BikesDAO.ListarBikesPorTipo(callback);
+        List<Bikes> bikesFiltradas = BikesDAO.ListarBikesPorTipo(data);
         List<String> modelo = new ArrayList();
 
         for (Bikes bike: bikesFiltradas)
@@ -253,5 +308,12 @@ public class Biketron3000 extends TelegramLongPollingBot
            modelo.add(bike.getModelo());
         }
         return modelo;
+    }
+
+    public List<Bikes> retornarDetalhesDoModelo(String data)
+    {
+        List<Bikes> bikesFiltradas = BikesDAO.buscarBikesPorModelo(data);
+
+        return  bikesFiltradas;
     }
 }

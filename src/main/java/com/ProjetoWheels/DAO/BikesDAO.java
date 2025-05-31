@@ -11,58 +11,44 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BikesDAO
-{
-    public static void salvarNoBancoDeDados(Bikes b)
-    {
+public class BikesDAO {
+    public static void salvarNoBancoDeDados(Bikes b) {
         String sql = "INSERT INTO Bikes (modelo, cor, tipo, status, atributos_especificos) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conexao = Conexao.getConnection();
-             PreparedStatement stmt = conexao.prepareStatement(sql))
-        {
-            stmt.setString(1,b.getModelo());
-            stmt.setString(2,b.getCor());
+             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+            stmt.setString(1, b.getModelo());
+            stmt.setString(2, b.getCor());
             stmt.setString(3, b.getClass().getSimpleName());
             stmt.setString(4, b.getStatusDisponibilidade().name());
 
-            if(b instanceof MountainBikes mountainBikes)
-            {
+            if (b instanceof MountainBikes mountainBikes) {
                 stmt.setString(5, mountainBikes.getBikeTipoPneu().name());
-            }
-            else if (b instanceof SpeedBikes speedBike)
-            {
+            } else if (b instanceof SpeedBikes speedBike) {
                 stmt.setString(5, speedBike.getBikeTamanhoQuadro().name());
-            }
-            else if (b instanceof ChildrensBikes  childrensBike)
-            {
+            } else if (b instanceof ChildrensBikes childrensBike) {
                 stmt.setString(5, childrensBike.getBikeTemRodinhas().name());
-            }
-            else
-            {
+            } else {
                 stmt.setString(5, null);
             }
 
             stmt.executeUpdate();
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException("Erro ao salvar bicicleta no banco de dados: " + e.getMessage());
         }
 
     }
-    public static List<Bikes> listarBikes()
-    {
+
+    public static List<Bikes> listarBikes() {
         List<Bikes> listaBikes = new ArrayList<>();
 
         String sql = "SELECT * FROM bikes";
 
         try (Connection conn = Conexao.getConnection();
              Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql))
-        {
-            while (rs.next())
-            {
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
                 int id = rs.getInt("id");
                 String modelo = rs.getString("modelo");
                 String cor = rs.getString("cor");
@@ -74,32 +60,22 @@ public class BikesDAO
 
                 Bikes bike = null;
 
-                if ("MountainBike".equalsIgnoreCase(tipo))
-                {
+                if ("MountainBike".equalsIgnoreCase(tipo)) {
                     bike = new MountainBikes(id, modelo, cor, TipoPneu.valueOf(atributo));
-                }
-                else if ("SpeedBikes".equalsIgnoreCase(tipo))
-                {
+                } else if ("SpeedBikes".equalsIgnoreCase(tipo)) {
                     bike = new SpeedBikes(id, modelo, cor, TamanhoQuadro.valueOf(atributo));
-                }
-                else if ("ChildrensBikes".equalsIgnoreCase(tipo))
-                {
+                } else if ("ChildrensBikes".equalsIgnoreCase(tipo)) {
                     bike = new ChildrensBikes(id, modelo, cor, TemRodinhas.valueOf(atributo));
-                }
-                else
-                {
+                } else {
                     bike = new DefaultBikes(id, modelo, cor);
                 }
 
-                if(bike != null)
-                {
+                if (bike != null) {
                     bike.setStatusDisponibilidade(statusBikes);
                     listaBikes.add(bike);
                 }
             }
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException("Erro ao listar bicicletas: " + e.getMessage());
         }
@@ -107,20 +83,18 @@ public class BikesDAO
         return listaBikes;
     }
 
-    public static List<Bikes> ListarBikesPorTipo(String tipo)
-    {
+    public static List<Bikes> ListarBikesPorTipo(String tipo) {
         List<Bikes> listaBikes = new ArrayList<>();
 
         String sql = "SELECT * FROM bikes WHERE tipo = ?";
 
-        try(Connection conn = Conexao.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql);
-        ){
-            stmt.setString(1,tipo);
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+        ) {
+            stmt.setString(1, tipo);
             ResultSet rs = stmt.executeQuery();
 
-            while(rs.next())
-            {
+            while (rs.next()) {
                 int id = rs.getInt("id");
                 String modelo = rs.getString("modelo");
                 String cor = rs.getString("cor");
@@ -130,6 +104,55 @@ public class BikesDAO
                 StatusBikes status = StatusBikes.valueOf(statusStr);
 
                 Bikes bike = null;
+
+                if ("MountainBikes".equalsIgnoreCase(tipo)) {
+                    bike = new MountainBikes(id, modelo, cor, TipoPneu.valueOf(atributo));
+                } else if ("SpeedBikes".equalsIgnoreCase(tipo)) {
+                    bike = new SpeedBikes(id, modelo, cor, TamanhoQuadro.valueOf(atributo));
+                } else if ("ChildrensBikes".equalsIgnoreCase(tipo)) {
+                    bike = new ChildrensBikes(id, modelo, cor, TemRodinhas.valueOf(atributo));
+                } else {
+                    bike = new DefaultBikes(id, modelo, cor);
+                }
+
+                if (bike != null) {
+                    bike.setStatusDisponibilidade(status);
+                    listaBikes.add(bike);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Erro ao listar bicicletas: " + e.getMessage());
+        }
+
+        return listaBikes;
+    }
+
+    public static List<Bikes> buscarBikesPorModelo(String modelo)
+    {
+        List<Bikes> listaBikes = new ArrayList<>();
+        String sql = "SELECT * FROM bikes WHERE modelo = ? and status= ? ";
+
+        try (Connection conexao = Conexao.getConnection();
+             PreparedStatement stmt = conexao.prepareStatement(sql))
+        {
+            stmt.setString(1, modelo);
+            stmt.setString(2, StatusBikes.DISPONIVEL.name());
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next())
+            {
+                int id = rs.getInt("id");
+                String tipo= rs.getString("tipo");
+                String cor = rs.getString("cor");
+                String atributo = rs.getString("atributos_especificos");
+                String statusStr = rs.getString("status");
+
+                StatusBikes status = StatusBikes.valueOf(statusStr);
+
+                Bikes bike = null;
+
 
                 if ("MountainBikes".equalsIgnoreCase(tipo))
                 {
@@ -148,19 +171,20 @@ public class BikesDAO
                     bike = new DefaultBikes(id, modelo, cor);
                 }
 
-                if(bike != null)
-                {
-                    bike.setStatusDisponibilidade(status);
-                    listaBikes.add(bike);
+                  listaBikes.add(bike);
                 }
+
             }
-        }
-        catch (SQLException e)
-        {
-            e.printStackTrace();
-            throw new RuntimeException("Erro ao listar bicicletas: " + e.getMessage());
+             catch (SQLException e)
+             {
+             e.printStackTrace();
+             }
+
+             return listaBikes;
+
         }
 
-        return listaBikes;
+
     }
-}
+
+
