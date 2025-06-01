@@ -26,7 +26,9 @@ public class MountainBikes extends  Bikes {
     }
 
     @Override
-    public double calcularPreco() {
+    public double calcularPreco()
+    {
+        preco = bikeTipoPneu.getPreco();
         return preco;
     }
 

@@ -11,7 +11,9 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 public class Biketron3000 extends TelegramLongPollingBot
@@ -27,20 +29,6 @@ public class Biketron3000 extends TelegramLongPollingBot
         return "Biketron3000";
     }
 
-    public void sendText(Long who, String what)
-    {
-        SendMessage sm = SendMessage.builder()
-                .chatId(who.toString())
-                .text(what).build();
-        try
-        {
-            execute(sm);
-        }
-        catch (TelegramApiException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
     @Override
     public void onUpdateReceived(Update update)
     {
@@ -55,7 +43,7 @@ public class Biketron3000 extends TelegramLongPollingBot
         }
     }
       // =============================
-     //  Processamento  mensagem
+     //  Processamento mensagem
     // =============================
 
     private void processarMensagemDeTexto(Message msg)
@@ -87,7 +75,8 @@ public class Biketron3000 extends TelegramLongPollingBot
         {
             enviarMenuModelosDeBike(chatId, data);
         }
-        else if (data.equals("AJUDA")) {
+        else if (data.equals("AJUDA"))
+        {
             String respostaAjuda = gerarMensagemAjuda();
             enviarMensagemSimples(chatId, respostaAjuda);
         }
@@ -115,7 +104,7 @@ public class Biketron3000 extends TelegramLongPollingBot
         List<Bikes> bikes = retornarDetalhesDoModelo(modelo);
 
         String textoMensagem = mensagemDetalhesModeloEscolhido(bikes);
-        String tipoDaBike = bikes.isEmpty() ? "" : bikes.get(0).getClass().getSimpleName();
+        String tipoDaBike = bikes.isEmpty() ? "" : bikes.getFirst().getClass().getSimpleName();
 
         SendMessage mensagem = new SendMessage();
         mensagem.setChatId(chatId.toString());
@@ -153,7 +142,7 @@ public class Biketron3000 extends TelegramLongPollingBot
     {
         if (listaBikes.isEmpty()) return "Nenhuma bicicleta desse modelo disponível no momento";
 
-        Bikes primeiraBike = listaBikes.get(0);
+        Bikes primeiraBike = listaBikes.getFirst();
         String modelo = primeiraBike.getModelo();
         String cor = primeiraBike.getCor();
         double preco = primeiraBike.calcularPreco();
@@ -183,7 +172,9 @@ public class Biketron3000 extends TelegramLongPollingBot
 
     private void enviarMenuModelosDeBike(Long chatId, String tipo)
     {
-        List<String> modelos = retornarBikesPortipo(tipo);
+        List<String> modelos = retornarBikesPorTipo(tipo);
+
+        Set<String> modelosUnicos = new HashSet<>(modelos);
 
         SendMessage mensagem = new SendMessage();
         mensagem.setChatId(chatId.toString());
@@ -191,7 +182,7 @@ public class Biketron3000 extends TelegramLongPollingBot
 
         List<List<InlineKeyboardButton>> linhas = new ArrayList<>();
 
-        for (String modelo : modelos)
+        for (String modelo :modelosUnicos)
         {
             InlineKeyboardButton botao = new InlineKeyboardButton();
             botao.setText(modelo);
@@ -292,16 +283,16 @@ public class Biketron3000 extends TelegramLongPollingBot
                 3️⃣ Escolha a bicicleta
                 4️⃣ Estabeleça o período do aluguel
                 5️⃣ Defina o método de pagamento
-                     """;
+                    \s""";
     }
     // =============================
    //  Acesso ao SQL
   // =============================
 
-    public List<String> retornarBikesPortipo(String data)
+    public List<String> retornarBikesPorTipo(String data)
     {
         List<Bikes> bikesFiltradas = BikesDAO.ListarBikesPorTipo(data);
-        List<String> modelo = new ArrayList();
+        List<String> modelo = new ArrayList<>();
 
         for (Bikes bike: bikesFiltradas)
         {
@@ -312,8 +303,7 @@ public class Biketron3000 extends TelegramLongPollingBot
 
     public List<Bikes> retornarDetalhesDoModelo(String data)
     {
-        List<Bikes> bikesFiltradas = BikesDAO.buscarBikesPorModelo(data);
 
-        return  bikesFiltradas;
+        return BikesDAO.buscarBikesPorModelo(data);
     }
 }

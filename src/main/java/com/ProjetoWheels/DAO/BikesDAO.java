@@ -105,11 +105,16 @@ public class BikesDAO {
 
                 Bikes bike = null;
 
-                if ("MountainBikes".equalsIgnoreCase(tipo)) {
+                if ("MountainBikes".equalsIgnoreCase(tipo))
+                {
                     bike = new MountainBikes(id, modelo, cor, TipoPneu.valueOf(atributo));
-                } else if ("SpeedBikes".equalsIgnoreCase(tipo)) {
+                }
+                else if ("SpeedBikes".equalsIgnoreCase(tipo))
+                {
                     bike = new SpeedBikes(id, modelo, cor, TamanhoQuadro.valueOf(atributo));
-                } else if ("ChildrensBikes".equalsIgnoreCase(tipo)) {
+                }
+                else if ("ChildrensBikes".equalsIgnoreCase(tipo))
+                {
                     bike = new ChildrensBikes(id, modelo, cor, TemRodinhas.valueOf(atributo));
                 } else {
                     bike = new DefaultBikes(id, modelo, cor);
