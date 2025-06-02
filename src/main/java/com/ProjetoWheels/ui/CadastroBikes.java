@@ -1,7 +1,11 @@
 package com.ProjetoWheels.ui;
 
+import com.ProjetoWheels.DAO.BikesDAO;
+import com.ProjetoWheels.enums.bikes.StatusBikes;
 import com.ProjetoWheels.enums.bikes.TamanhoQuadro;
+import com.ProjetoWheels.enums.bikes.TemRodinhas;
 import com.ProjetoWheels.enums.bikes.TipoPneu;
+import com.ProjetoWheels.model.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,63 +32,67 @@ public class CadastroBikes extends JDialog
     }
     private void initComponentes()
     {
-        JPanel form = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel form = new JPanel();
+        form.setLayout(new BoxLayout(form, BoxLayout.Y_AXIS));
+        form.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
+        JPanel corPanel = new JPanel(new BorderLayout());
+        corPanel.add(new JLabel("Cor:"), BorderLayout.NORTH);
         campoCor = new JTextField(20);
-        campoCor.setPreferredSize(new Dimension(100, 50));
-        form.add(new JLabel("Cor:"));
-        form.add(campoCor);
+        corPanel.add(campoCor, BorderLayout.CENTER);
+        form.add(corPanel);
+        form.add(Box.createVerticalStrut(15));
 
+        JPanel modeloPanel = new JPanel(new BorderLayout());
+        modeloPanel.add(new JLabel("Modelo:"), BorderLayout.NORTH);
         campoModelo = new JTextField(20);
-        campoModelo.setPreferredSize(new Dimension(100, 50));
-        form.add(new JLabel("Modelo:"));
-        form.add(campoModelo);
+        modeloPanel.add(campoModelo, BorderLayout.CENTER);
+        form.add(modeloPanel);
+        form.add(Box.createVerticalStrut(15));
 
-
-        ButtonGroup grupo = new ButtonGroup();
+        JPanel tipoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        tipoPanel.add(new JLabel("Tipo:"));
         radioMountain = new JRadioButton("MountainBike");
         radioSpeed = new JRadioButton("SpeedBike");
-        radioChildrens = new JRadioButton("ChildrenBike");
-        radioDefault = new JRadioButton("DefaultBike");
+        radioDefault = new JRadioButton("Urbana");
+        radioChildrens = new JRadioButton("Infantil");
 
+        ButtonGroup grupo = new ButtonGroup();
         grupo.add(radioMountain);
         grupo.add(radioSpeed);
         grupo.add(radioDefault);
         grupo.add(radioChildrens);
 
-        radioMountain.addActionListener(e -> atualizarExtras());
-        radioSpeed.addActionListener(e -> atualizarExtras());
-
-        form.add(new JLabel("Tipo:"));
-
-        JPanel tipoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-
         tipoPanel.add(radioMountain);
         tipoPanel.add(radioSpeed);
         tipoPanel.add(radioDefault);
         tipoPanel.add(radioChildrens);
-
         form.add(tipoPanel);
-
-
-
-
-        radioComRodinhas = new JRadioButton("Como Rodinhas");
-        radioSemRodinhas = new JRadioButton("Sem Rodinhas");
-        grupoRodinhas.add(radioComRodinhas);
 
         painelExtra = new JPanel(new FlowLayout(FlowLayout.LEFT));
         comboTipoPneu = new JComboBox<>(TipoPneu.values());
-        comboTamanhoQuadro= new JComboBox<>(TamanhoQuadro.values());
+        comboTamanhoQuadro = new JComboBox<>(TamanhoQuadro.values());
+        radioComRodinhas = new JRadioButton("Com Rodinhas");
+        radioSemRodinhas = new JRadioButton("Sem Rodinhas");
+        grupoRodinhas.add(radioComRodinhas);
+        grupoRodinhas.add(radioSemRodinhas);
 
+        form.add(painelExtra);
         atualizarExtras();
 
-        add(form, BorderLayout.CENTER);
-        add(painelExtra, BorderLayout.NORTH);
+        radioMountain.addActionListener(e -> atualizarExtras());
+        radioSpeed.addActionListener(e -> atualizarExtras());
+        radioChildrens.addActionListener(e -> atualizarExtras());
+        radioDefault.addActionListener(e -> atualizarExtras());
 
         JButton salvar = new JButton("Salvar");
         salvar.addActionListener(e -> salvarBicicleta());
-        add(salvar, BorderLayout.SOUTH);
+
+        JPanel botaoPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        botaoPanel.add(salvar);
+
+        add(form, BorderLayout.CENTER);
+        add(botaoPanel, BorderLayout.SOUTH);
     }
     private void atualizarExtras() {
         painelExtra.removeAll();
@@ -100,9 +108,7 @@ public class CadastroBikes extends JDialog
         }
         else if (radioChildrens.isSelected())
         {
-            painelExtra.add(new JLabel("Com Rodinhas?"));
             painelExtra.add(radioComRodinhas);
-            painelExtra.add(new JLabel("Sem Rodinhas?"));
             painelExtra.add(radioSemRodinhas);
         }
         else if (radioDefault.isSelected())
@@ -110,11 +116,9 @@ public class CadastroBikes extends JDialog
             painelExtra.removeAll();
 
         }
-
         painelExtra.revalidate();
         painelExtra.repaint();
     }
-
 
     private  void salvarBicicleta()
     {
@@ -127,7 +131,39 @@ public class CadastroBikes extends JDialog
             return;
         }
 
+        Bikes novaBike;
 
+        if (radioMountain.isSelected())
+        {
+            TipoPneu tipoPneu = (TipoPneu) comboTipoPneu.getSelectedItem();
+            novaBike = new MountainBikes(modelo, cor, StatusBikes.DISPONIVEL,tipoPneu);
+        }
+        else if (radioSpeed.isSelected())
+        {
+            TamanhoQuadro tamanhoQuadro = (TamanhoQuadro) comboTamanhoQuadro.getSelectedItem();
+            novaBike = new SpeedBikes(modelo, cor, StatusBikes.DISPONIVEL,tamanhoQuadro);
+        }
+        else if (radioChildrens.isSelected())
+        {
+            TemRodinhas rodinhas = radioComRodinhas.isSelected() ? TemRodinhas.SIM : TemRodinhas.NAO;
+            novaBike = new ChildrensBikes(modelo, cor, StatusBikes.DISPONIVEL, rodinhas);
+        }
+        else
+        {
+            novaBike = new DefaultBikes(modelo, cor, StatusBikes.DISPONIVEL);
+        }
+        novaBike.setStatusDisponibilidade(StatusBikes.DISPONIVEL);
+
+        try
+        {
+            BikesDAO.salvarNoBancoDeDados(novaBike);
+            JOptionPane.showMessageDialog(this, "Bicicleta salva com sucesso!");
+            dispose(); // Fecha o diálogo
+        }
+        catch (Exception ex)
+        {
+            JOptionPane.showMessageDialog(this, "Erro ao salvar a bicicleta: " + ex.getMessage());
+            ex.printStackTrace();
+        }
     }
-
 }
