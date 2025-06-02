@@ -1,5 +1,6 @@
 package com.ProjetoWheels.chat;
 import com.ProjetoWheels.DAO.BikesDAO;
+import com.ProjetoWheels.enums.usuarios.EstadoUsuario;
 import com.ProjetoWheels.model.Bikes;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -10,14 +11,15 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 public class Biketron3000 extends TelegramLongPollingBot
 {
+
+    private Map<Long, EstadoUsuario> estadosUsuario = new HashMap<>();
+    private Map<Long, List<String>> modelosEscolhidosPorUsuario = new HashMap<>();
+
 
     @Override
     public String getBotToken() {
@@ -63,24 +65,53 @@ public class Biketron3000 extends TelegramLongPollingBot
         Long chatId = callbackQuery.getMessage().getChatId();
 
 
-         if (data.equals("ESCOLHER_TIPO"))
+        if (data.equals("ESCOLHER_TIPO"))
         {
             enviarMenuTiposDeBike(chatId);
-        }
-        else if (data.startsWith("ESCOLHER_MODELO_"))
-        {
-            processarEscolhaDeModelo(chatId, data);
+            estadosUsuario.put(chatId, EstadoUsuario.ESCOLHENDO_TIPO);
         }
         else if (isTipoDeBike(data))
         {
             enviarMenuModelosDeBike(chatId, data);
+            estadosUsuario.put(chatId, EstadoUsuario.ESCOLHENDO_MODELO);
+        }
+        else if (data.startsWith("ESCOLHER_MODELO_"))
+        {
+            processarEscolhaDeModelo(chatId, data);
+            estadosUsuario.put(chatId, EstadoUsuario.ESCOLHENDO_MODELO);
+        }
+        else if (data.startsWith("CONFIRMAR_"))
+        {
+            String resto = data.replace("CONFIRMAR_", "");
+            String[] partes = resto.split("_", 2);
+            String modeloConfirmado = partes[0];
+            String corConfirmada = partes.length > 1 ? partes[1] : "";
+
+            modelosEscolhidosPorUsuario.putIfAbsent(chatId, new ArrayList<>());
+            modelosEscolhidosPorUsuario.get(chatId).add(modeloConfirmado + " - cor: " + corConfirmada);
+
+            mensagemEscolherDuracaoOuMaisBike(chatId, modeloConfirmado, corConfirmada);
+
+            estadosUsuario.put(chatId, EstadoUsuario.AGUARDANDO_ESCOLHA_DURACAO_OU_MAIS);
+        }
+        else if (data.equals("ESCOLHER_MAIS_UMA"))
+        {
+            enviarMenuTiposDeBike(chatId);
+            estadosUsuario.put(chatId, EstadoUsuario.ESCOLHENDO_TIPO);
+        }
+        else if (data.startsWith("ESCOLHER_DURACAO_"))
+        {
+            mensagemEscolhaDeDias(chatId);
+            estadosUsuario.put(chatId, EstadoUsuario.ESCOLHANDO_DIAS);
         }
         else if (data.equals("AJUDA"))
         {
             String respostaAjuda = gerarMensagemAjuda();
             enviarMensagemSimples(chatId, respostaAjuda);
+
         }
-        else {
+        else
+        {
             enviarMensagemSimples(chatId, "Opção desconhecida.");
         }
 
@@ -105,27 +136,102 @@ public class Biketron3000 extends TelegramLongPollingBot
 
         String textoMensagem = mensagemDetalhesModeloEscolhido(bikes);
         String tipoDaBike = bikes.isEmpty() ? "" : bikes.getFirst().getClass().getSimpleName();
+        String cor = bikes.isEmpty() ? "" : bikes.getFirst().getCor();
 
         SendMessage mensagem = new SendMessage();
         mensagem.setChatId(chatId.toString());
         mensagem.setText(textoMensagem);
         mensagem.enableMarkdown(true);
 
-        InlineKeyboardMarkup teclado = menuReumoDaBike(modelo, tipoDaBike);
+        InlineKeyboardMarkup teclado = menuReumoDaBike(modelo, cor, tipoDaBike);
         mensagem.setReplyMarkup(teclado);
 
         enviarMensagem(mensagem);
 
     }
-    // =============================
-   //  Menus e mensagens
   // =============================
+ //  Menus e mensagens
+// =============================
+     private void mensagemEscolherDuracaoOuMaisBike(Long chatId, String modelo, String cor)
+     {
+      SendMessage mensagem = new SendMessage();
+      mensagem.setChatId(chatId.toString());
+      mensagem.setText("Você confirmou o modelo " + modelo + " na cor " + cor + ".\n\nO que deseja fazer agora?");
 
-    private  InlineKeyboardMarkup menuReumoDaBike(String modelo, String tipo)
+      InlineKeyboardButton botaoEscolherDuracao = new InlineKeyboardButton();
+      botaoEscolherDuracao.setText("Escolher Duração do Aluguel");
+      botaoEscolherDuracao.setCallbackData("ESCOLHER_DURACAO_" + modelo + "_" + cor);
+
+      InlineKeyboardButton botaoEscolherMaisBike = new InlineKeyboardButton();
+      botaoEscolherMaisBike.setText("Escolher mais uma bike");
+      botaoEscolherMaisBike.setCallbackData("ESCOLHER_MAIS_UMA");
+
+      List<List<InlineKeyboardButton>> linhas = List.of(List.of(botaoEscolherDuracao), List.of(botaoEscolherMaisBike));
+
+      InlineKeyboardMarkup teclado = new InlineKeyboardMarkup();
+      teclado.setKeyboard(linhas);
+
+      mensagem.setReplyMarkup(teclado);
+
+      enviarMensagem(mensagem);
+    }
+
+    private void mensagemEscolhaDeDias(Long chatId)
+    {
+     List<String> escolhas = modelosEscolhidosPorUsuario.getOrDefault(chatId, new ArrayList<>());
+
+
+     StringBuilder texto = new StringBuilder("Você escolheu etas bicicletas:\n\n");
+
+        for (String escolha : escolhas)
+        {
+            texto.append("• ").append(escolha).append("\n");
+        }
+
+     texto.append("\nAgora escolha o Tempo de aluguel:");
+     SendMessage mensagem = new SendMessage();
+     mensagem.setChatId(chatId.toString());
+     mensagem.setText(texto.toString());
+
+     InlineKeyboardMarkup tecladoDias = menuEscolhaDeDias();
+     mensagem.setReplyMarkup(tecladoDias);
+
+     enviarMensagem(mensagem);
+
+    }
+
+    private InlineKeyboardMarkup menuEscolhaDeDias() {
+        InlineKeyboardButton dias3 = new InlineKeyboardButton();
+        dias3.setText("3 dias");
+        dias3.setCallbackData("ESCOLHER_DIAS_3");
+
+        InlineKeyboardButton dias7 = new InlineKeyboardButton();
+        dias7.setText("7 dias");
+        dias7.setCallbackData("ESCOLHER_DIAS_7");
+
+        InlineKeyboardButton dias10 = new InlineKeyboardButton();
+        dias10.setText("10 dias");
+        dias10.setCallbackData("ESCOLHER_DIAS_10");
+
+        InlineKeyboardButton dias15 = new InlineKeyboardButton();
+        dias15.setText("15 dias");
+        dias15.setCallbackData("ESCOLHER_DIAS_15");
+
+        List<List<InlineKeyboardButton>> linhas = List.of(
+                List.of(dias3), List.of(dias7), List.of(dias10), List.of(dias15)
+        );
+
+        InlineKeyboardMarkup teclado = new InlineKeyboardMarkup();
+        teclado.setKeyboard(linhas);
+
+        return teclado;
+    }
+
+    private InlineKeyboardMarkup menuReumoDaBike(String modelo, String cor, String tipo)
     {
         InlineKeyboardButton botaoConfirmar = new InlineKeyboardButton();
-        botaoConfirmar.setText("Confirmar");
-        botaoConfirmar.setCallbackData("CONFIRMAR_MODELO" + modelo);
+        botaoConfirmar.setText("Confirmar " + modelo + " na cor " + cor);
+        botaoConfirmar.setCallbackData("CONFIRMAR_" + modelo + "_" + cor);
 
         InlineKeyboardButton botaoVoltar = new InlineKeyboardButton();
         botaoVoltar.setText("Voltar");
@@ -137,7 +243,6 @@ public class Biketron3000 extends TelegramLongPollingBot
 
         return teclado;
     }
-
     private String mensagemDetalhesModeloEscolhido(List<Bikes> listaBikes)
     {
         if (listaBikes.isEmpty()) return "Nenhuma bicicleta desse modelo disponível no momento";
