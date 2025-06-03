@@ -62,10 +62,10 @@ public class TelaAdministrador extends JFrame
                 int col = tabela.columnAtPoint(e.getPoint());
 
                 if (row != -1) {
-                    tabela.setRowSelectionInterval(row, row); // Sempre seleciona a linha inteira
+                    tabela.setRowSelectionInterval(row, row);
                 }
 
-                if (e.getClickCount() == 2 && col != 0) { // Duplo clique: edita, exceto coluna ID
+                if (e.getClickCount() == 2 && col != 0) {
                     tabela.editCellAt(row, col);
                 }
             }
@@ -87,12 +87,6 @@ public class TelaAdministrador extends JFrame
             telaCadastro.setVisible(true);
         });
 
-//        JButton botaoEditar = new JButton("Editar");
-//        botaoEditar.addActionListener(e ->{
-//            EditBikes telaEdicao = new EditBikes(this);
-//            telaEdicao.setVisible(true);
-//        });
-
         JButton botaoDeletar = new JButton("Deletar");
         botaoDeletar.addActionListener(e ->{
 
@@ -109,7 +103,6 @@ public class TelaAdministrador extends JFrame
 
         JPanel painelBotoesSouth = new JPanel();
         painelBotoesSouth.add(botaoAdicionar);
-//        painelBotoesSouth.add(botaoEditar);
         painelBotoesSouth.add(botaoDeletar);
         add(painelBotoesSouth,BorderLayout.SOUTH);
 

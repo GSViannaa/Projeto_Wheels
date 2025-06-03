@@ -164,7 +164,7 @@ public class CadastroBikes extends JDialog
         {
             BikesDAO.salvarNoBancoDeDados(novaBike);
             JOptionPane.showMessageDialog(this, "Bicicleta salva com sucesso!");
-            dispose(); // Fecha o diálogo
+            dispose();
         }
         catch (Exception ex)
         {

@@ -226,7 +226,7 @@ public class BikesDAO {
         {
             case 1 -> "modelo";
             case 2 -> "cor";
-            case 4 -> "status"; // supondo que 4 é o statusDisponibilidade
+            case 4 -> "status";
             default -> null;
         };
         if (nomeColuna == null) return;
