@@ -15,26 +15,27 @@ import java.util.List;
 @AllArgsConstructor
 public class AluguelService
 {
+    private static double valorSeguro = 50;
     private List<Bikes> listaBikes;
     private Cliente cliente;
     private LocalDate dataInicio;
     private LocalDate dataFim;
+    private double valorTotal;
 
 
-    public double calcularTotal()
+    public static double calcularTotal(List<Bikes> bikes, String diasString)
     {
-        long dias = ChronoUnit.DAYS.between(dataInicio, dataFim);
 
-        if (dias <= 0) dias = 1;
+        double dias = Integer.parseInt(diasString);
 
         double total = 0;
 
-        for(Bikes b : listaBikes)
+        for(Bikes b : bikes)
         {
             total += b.calcularPreco();
         }
 
-        return total;
+        return (total * dias) + valorSeguro;
     }
 
 }

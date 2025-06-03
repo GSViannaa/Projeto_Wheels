@@ -2,12 +2,12 @@ package com.ProjetoWheels.enums.bikes;
 
 public enum TamanhoQuadro
 {
-    XS(45.0),  // Extra pequeno (geralmente 47-49 cm)
-    S(50.0),   // Pequeno (50-52 cm)
-    M(55.0),   // Médio (53-55 cm)
-    L(60.0),   // Grande (56-58 cm)
-    XL(65.0),  // Extra grande (59-61 cm)
-    XXL(70.0); // Muito grande (62 cm+)
+    XS(25.0),  // Extra pequeno (geralmente 47-49 cm)
+    S(30.0),   // Pequeno (50-52 cm)
+    M(35.0),   // Médio (53-55 cm)
+    L(40.0),   // Grande (56-58 cm)
+    XL(40.0),  // Extra grande (59-61 cm)
+    XXL(40.0); // Muito grande (62 cm+)
 
     private final double preco;
     TamanhoQuadro(double preco) {this.preco = preco;}
