@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ForceReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -65,7 +66,6 @@ public class Biketron3000 extends TelegramLongPollingBot
         String data = callbackQuery.getData();
         Long chatId = callbackQuery.getMessage().getChatId();
 
-
         if (data.equals("ESCOLHER_TIPO"))
         {
             enviarMenuTiposDeBike(chatId);
@@ -98,14 +98,13 @@ public class Biketron3000 extends TelegramLongPollingBot
         }
         else if (data.startsWith("ESCOLHER_DIAS_"))
         {
-            List<Bikes> b = modelosEscolhidosPorUsuario.get(chatId);
-
-           double sla = servicoCalcularPreco(data, b );
-           String sla1 = Double.toString(sla);
+            String textoResumo = mensagemResumoAluguel(chatId, data);
+            InlineKeyboardMarkup teclado = menuFinalizarSelecao();
 
             SendMessage mensagem = new SendMessage();
             mensagem.setChatId(chatId.toString());
-            mensagem.setText(sla1);
+            mensagem.setReplyMarkup(teclado);
+            mensagem.setText(textoResumo);
             enviarMensagem(mensagem);
 
         }
@@ -172,6 +171,48 @@ public class Biketron3000 extends TelegramLongPollingBot
   // =============================
  //  Menus e mensagens
 // =============================
+    private InlineKeyboardMarkup menuFinalizarSelecao()
+    {
+       InlineKeyboardButton finalizarSelecao = new InlineKeyboardButton();
+       finalizarSelecao.setText("Confirmar");
+       finalizarSelecao.setCallbackData("FINALIZAR_");
+
+       InlineKeyboardButton voltarSelecao = new InlineKeyboardButton();
+       voltarSelecao.setText("Cancelar");
+       voltarSelecao.setCallbackData("CANCELAR_");
+
+        List<List<InlineKeyboardButton>> linhas = List.of(List.of(finalizarSelecao), List.of(voltarSelecao));
+
+        InlineKeyboardMarkup teclado = new InlineKeyboardMarkup();
+        teclado.setKeyboard(linhas);
+
+        return teclado;
+    }
+    private String mensagemResumoAluguel(Long chatId, String data)
+
+    {
+        List<Bikes> bikes = modelosEscolhidosPorUsuario.get(chatId);
+
+        String diasString = data.replace("ESCOLHER_DIAS_", "");
+
+        StringBuilder texto = new StringBuilder("Você escolheu estas bicicletas:\n\n");
+
+        for (Bikes b : bikes)
+        {
+            texto.append("• ").append(b.getModelo()).append(" na cor ").append(b.getCor()).append("\n");
+            texto.append("- " + "Valor do dia: R$").append(b.calcularPreco()).append("\n");
+            texto.append("- ").append("Quantidade de dias: ").append(diasString).append("\n");
+
+            double total = servicoCalcularPrecoIndividual(data, b);
+
+            texto.append("- ").append("Valor: R$").append(total).append("\n\n");
+        }
+
+        texto.append("Valor de seguro: R$50").append("\n");
+        texto.append("Valor Total: R$").append(servicoCalcularPrecoTotal(data,bikes));
+
+        return texto.toString();
+    }
      private void mensagemEscolherDuracaoOuMaisBike(Long chatId, String modelo, String cor)
      {
       SendMessage mensagem = new SendMessage();
@@ -201,7 +242,7 @@ public class Biketron3000 extends TelegramLongPollingBot
      List<Bikes> escolhas = modelosEscolhidosPorUsuario.getOrDefault(chatId, new ArrayList<>());
 
 
-     StringBuilder texto = new StringBuilder("Você escolheu etas bicicletas:\n\n");
+     StringBuilder texto = new StringBuilder("Você escolheu estas bicicletas:\n\n");
 
         for (Bikes escolha : escolhas)
         {
@@ -427,18 +468,34 @@ public class Biketron3000 extends TelegramLongPollingBot
 
     public List<Bikes> retornarDetalhesDoModelo(String data)
     {
-
         return BikesDAO.buscarBikesPorModelo(data);
     }
     // =============================
    //  Serviços
   // ==============================
 
-    public double servicoCalcularPreco(String data,  List<Bikes> listaBikesSelecionadas)
+    public double servicoCalcularPrecoIndividual(String data,  Bikes listaBikesSelecionadas)
     {
         String diasString = data.replace("ESCOLHER_DIAS_", "");
-        double preco = AluguelService.calcularTotal( listaBikesSelecionadas, diasString);
-        return preco;
+        return AluguelService.calcularValorIndivudal( listaBikesSelecionadas, diasString);
     }
+    public double servicoCalcularPrecoTotal(String data,  List<Bikes> bikesSelecionadas)
+    {
+        String diasString = data.replace("ESCOLHER_DIAS_", "");
+        return AluguelService.calcularTotal( bikesSelecionadas, diasString);
+    }
+
+
+    public void mensagemEmailForceReply(long chatId) throws TelegramApiException
+    {
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId);
+        message.setText("Por favor, envie seu e-mail:");
+        ForceReplyKeyboard forceReply = new ForceReplyKeyboard();
+        forceReply.setForceReply(true);
+        message.setReplyMarkup(forceReply);
+        execute(message);
+    }
+
 }
 
