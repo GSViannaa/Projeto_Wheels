@@ -25,17 +25,23 @@ public class AluguelService
 
     public static double calcularTotal(List<Bikes> bikes, String diasString)
     {
+      double totalFinal = 0;
 
+      for(Bikes b : bikes)
+      {
+         totalFinal += calcularValorIndivudal(b,diasString);
+      }
+
+        return totalFinal + valorSeguro;
+    }
+
+    public static double calcularValorIndivudal(Bikes bikes, String diasString)
+    {
         double dias = Integer.parseInt(diasString);
+        double total = bikes.calcularPreco();
 
-        double total = 0;
+        return (total * dias);
 
-        for(Bikes b : bikes)
-        {
-            total += b.calcularPreco();
-        }
-
-        return (total * dias) + valorSeguro;
     }
 
 }
