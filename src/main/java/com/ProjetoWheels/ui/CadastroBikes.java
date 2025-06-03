@@ -58,8 +58,8 @@ public class CadastroBikes extends JDialog
 
         JPanel tipoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         tipoPanel.add(new JLabel("Tipo:"));
-        radioMountain = new JRadioButton("MountainBike");
-        radioSpeed = new JRadioButton("SpeedBike");
+        radioMountain = new JRadioButton("Mountain Bike");
+        radioSpeed = new JRadioButton("Speed Bike");
         radioDefault = new JRadioButton("Urbana");
         radioChildrens = new JRadioButton("Infantil");
 
@@ -164,7 +164,7 @@ public class CadastroBikes extends JDialog
         {
             BikesDAO.salvarNoBancoDeDados(novaBike);
             JOptionPane.showMessageDialog(this, "Bicicleta salva com sucesso!");
-            dispose(); // Fecha o diálogo
+            dispose();
         }
         catch (Exception ex)
         {

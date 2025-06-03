@@ -38,7 +38,22 @@ public class BikesDAO {
             e.printStackTrace();
             throw new RuntimeException("Erro ao salvar bicicleta no banco de dados: " + e.getMessage());
         }
+    }
 
+    public static boolean deletarBike(int id) {
+        String sql = "DELETE FROM bikes WHERE id = ?";
+
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+            int linhasAfetadas = stmt.executeUpdate();
+
+            return linhasAfetadas > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public static List<Bikes> listarBikes() {
@@ -211,7 +226,7 @@ public class BikesDAO {
         {
             case 1 -> "modelo";
             case 2 -> "cor";
-            case 4 -> "status"; // supondo que 4 é o statusDisponibilidade
+            case 4 -> "status";
             default -> null;
         };
         if (nomeColuna == null) return;
