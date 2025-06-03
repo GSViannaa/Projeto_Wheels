@@ -28,6 +28,7 @@ public class ChildrensBikes extends Bikes
     @Override
     public double calcularPreco()
     {
+        preco = bikeTemRodinhas.getPreco();
         return preco;
     }
 

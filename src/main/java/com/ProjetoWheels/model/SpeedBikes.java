@@ -26,8 +26,10 @@ public class SpeedBikes extends Bikes {
         this.bikeTamanhoQuadro = tamanhoQuadro;
     }
     @Override
-    public double calcularPreco() {
-        return 0;
+    public double calcularPreco()
+    {
+        preco = bikeTamanhoQuadro.getPreco();
+        return preco;
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.ProjetoWheels.chat;
 import com.ProjetoWheels.DAO.BikesDAO;
 import com.ProjetoWheels.enums.usuarios.EstadoUsuario;
 import com.ProjetoWheels.model.Bikes;
+import com.ProjetoWheels.service.AluguelService;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -18,7 +19,7 @@ public class Biketron3000 extends TelegramLongPollingBot
 {
 
     private Map<Long, EstadoUsuario> estadosUsuario = new HashMap<>();
-    private Map<Long, List<String>> modelosEscolhidosPorUsuario = new HashMap<>();
+    private Map<Long, List<Bikes>> modelosEscolhidosPorUsuario = new HashMap<>();
 
 
     @Override
@@ -82,16 +83,7 @@ public class Biketron3000 extends TelegramLongPollingBot
         }
         else if (data.startsWith("CONFIRMAR_"))
         {
-            String resto = data.replace("CONFIRMAR_", "");
-            String[] partes = resto.split("_", 2);
-            String modeloConfirmado = partes[0];
-            String corConfirmada = partes.length > 1 ? partes[1] : "";
-
-            modelosEscolhidosPorUsuario.putIfAbsent(chatId, new ArrayList<>());
-            modelosEscolhidosPorUsuario.get(chatId).add(modeloConfirmado + " - cor: " + corConfirmada);
-
-            mensagemEscolherDuracaoOuMaisBike(chatId, modeloConfirmado, corConfirmada);
-
+            processarConfirmacaoDeModelo(data, chatId);
             estadosUsuario.put(chatId, EstadoUsuario.AGUARDANDO_ESCOLHA_DURACAO_OU_MAIS);
         }
         else if (data.equals("ESCOLHER_MAIS_UMA"))
@@ -103,6 +95,19 @@ public class Biketron3000 extends TelegramLongPollingBot
         {
             mensagemEscolhaDeDias(chatId);
             estadosUsuario.put(chatId, EstadoUsuario.ESCOLHANDO_DIAS);
+        }
+        else if (data.startsWith("ESCOLHER_DIAS_"))
+        {
+            List<Bikes> b = modelosEscolhidosPorUsuario.get(chatId);
+
+           double sla = servicoCalcularPreco(data, b );
+           String sla1 = Double.toString(sla);
+
+            SendMessage mensagem = new SendMessage();
+            mensagem.setChatId(chatId.toString());
+            mensagem.setText(sla1);
+            enviarMensagem(mensagem);
+
         }
         else if (data.equals("AJUDA"))
         {
@@ -126,7 +131,7 @@ public class Biketron3000 extends TelegramLongPollingBot
     }
 
     // =============================
-   //  Processar escolha de modelos
+   //  Processos locais
   // =============================
     private void processarEscolhaDeModelo(Long chatId, String data)
     {
@@ -148,6 +153,21 @@ public class Biketron3000 extends TelegramLongPollingBot
 
         enviarMensagem(mensagem);
 
+    }
+    private void processarConfirmacaoDeModelo(String data, Long chatId)
+    {
+        String resto = data.replace("CONFIRMAR_", "");
+        String[] partes = resto.split("_", 2);
+        String modeloConfirmado = partes[0];
+        String corConfirmada = partes.length > 1 ? partes[1] : "";
+
+        List<Bikes> bikeEscolhida = retornarDetalhesDoModelo(modeloConfirmado);
+        Bikes b = bikeEscolhida.get(0);
+
+        modelosEscolhidosPorUsuario.putIfAbsent(chatId, new ArrayList<>());
+        modelosEscolhidosPorUsuario.get(chatId).add(b);
+
+        mensagemEscolherDuracaoOuMaisBike(chatId, modeloConfirmado, corConfirmada);
     }
   // =============================
  //  Menus e mensagens
@@ -178,14 +198,14 @@ public class Biketron3000 extends TelegramLongPollingBot
 
     private void mensagemEscolhaDeDias(Long chatId)
     {
-     List<String> escolhas = modelosEscolhidosPorUsuario.getOrDefault(chatId, new ArrayList<>());
+     List<Bikes> escolhas = modelosEscolhidosPorUsuario.getOrDefault(chatId, new ArrayList<>());
 
 
      StringBuilder texto = new StringBuilder("Você escolheu etas bicicletas:\n\n");
 
-        for (String escolha : escolhas)
+        for (Bikes escolha : escolhas)
         {
-            texto.append("• ").append(escolha).append("\n");
+            texto.append("• ").append(escolha.getModelo()).append(" na cor").append(escolha.getCor()).append("\n");
         }
 
      texto.append("\nAgora escolha o Tempo de aluguel:");
@@ -264,7 +284,6 @@ public class Biketron3000 extends TelegramLongPollingBot
                 modelo, cor, preco, quantidadeDisponivel
         );
     }
-
 
     private void enviarMenuTiposDeBike(Long chatId)
     {
@@ -411,4 +430,15 @@ public class Biketron3000 extends TelegramLongPollingBot
 
         return BikesDAO.buscarBikesPorModelo(data);
     }
+    // =============================
+   //  Serviços
+  // ==============================
+
+    public double servicoCalcularPreco(String data,  List<Bikes> listaBikesSelecionadas)
+    {
+        String diasString = data.replace("ESCOLHER_DIAS_", "");
+        double preco = AluguelService.calcularTotal( listaBikesSelecionadas, diasString);
+        return preco;
+    }
 }
+
