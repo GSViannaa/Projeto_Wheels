@@ -2,6 +2,7 @@ package com.ProjetoWheels.enums.usuarios;
 
 public enum EstadoUsuario {
 
+    MENU_PRINCIPAL,
     ESCOLHENDO_TIPO,
     ESCOLHENDO_MODELO,
     AGUARDANDO_ESCOLHA_DURACAO_OU_MAIS,

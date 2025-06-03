@@ -37,7 +37,7 @@ public class Biketron3000 extends TelegramLongPollingBot
     @Override
     public void onUpdateReceived(Update update)
     {
-        if (update.hasMessage() && !servicoVerificarEstado())
+        if (update.hasMessage() && update.getMessage().hasText())
         {
             processarMensagemDeTexto(update.getMessage());
         }
@@ -61,20 +61,62 @@ public class Biketron3000 extends TelegramLongPollingBot
     private void processarMensagemDeTexto(Message msg)
     {
         Long chatId = msg.getChatId();
-        SendMessage mensagem = criarMensagemInicial(chatId);
-        enviarMensagem(mensagem);
+        String texto = msg.getText();
+
+        EstadoUsuario estadoAtual = estadosUsuario.getOrDefault(chatId, EstadoUsuario.MENU_PRINCIPAL);
+
+        switch (estadoAtual)
+        {
+            case MENU_PRINCIPAL ->
+            {
+
+                SendMessage mensagem = criarMensagemInicial(chatId);
+                enviarMensagem(mensagem);
+            }
+
+            case AGUARDANDO_EMAIL ->
+            {
+                boolean valido = ValidacaoService.isValidEmail(texto);
+
+                if (valido)
+                {
+                    enviarMensagemSimples(chatId, "✅ Email válido! Agora escolha a forma de pagamento:");
+
+                    String linkMercadoPago = "https://www.mercadopago.com/checkout/v1/redirect?pref_id=SUA_PREFERENCIA";
+                    String linkPicPay = "https://picpay.me/seuUsuario/valor";
+
+                    enviarMenuPagamentoComLinks(chatId, linkMercadoPago, linkPicPay);
+
+                    estadosUsuario.put(chatId, EstadoUsuario.ESCOLHENDO_PAGAMENTO);
+                }
+                else
+                {
+                    enviarMensagemSimples(chatId, "❌ Email inválido. Por favor, digite um email válido:");
+
+                }
+            }
+            case ESCOLHENDO_PAGAMENTO ->
+            {
+
+                enviarMensagemSimples(chatId, "Por favor, escolha a forma de pagamento nos botões abaixo.");
+            }
+
+            default ->
+            {
+
+                enviarMensagemSimples(chatId, "Use os botões para navegar pelo menu.");
+            }
+        }
     }
 
      // =============================
     //  Processamento  callback
-   // =============================
+   // ==============================
 
     private void processarCallback(CallbackQuery callbackQuery) throws TelegramApiException
     {
-
         String data = callbackQuery.getData();
         Long chatId = callbackQuery.getMessage().getChatId();
-
 
         if (data.equals("ESCOLHER_TIPO"))
         {
@@ -108,14 +150,9 @@ public class Biketron3000 extends TelegramLongPollingBot
         }
         else if (data.startsWith("ESCOLHER_DIAS_"))
         {
+
             String textoResumo = mensagemResumoAluguel(chatId, data);
             InlineKeyboardMarkup teclado = menuFinalizarSelecao();
-
-            String email = callbackQuery.getMessage().toString();
-
-            boolean aa = ValidacaoService.isValidEmail(email);
-
-            System.out.println(aa);
 
             SendMessage mensagem = new SendMessage();
             mensagem.setChatId(chatId.toString());
@@ -123,12 +160,14 @@ public class Biketron3000 extends TelegramLongPollingBot
             mensagem.setText(textoResumo);
             enviarMensagem(mensagem);
 
-            estadosUsuario.put(chatId, EstadoUsuario.AGUARDANDO_EMAIL);
 
+            estadosUsuario.put(chatId, EstadoUsuario.AGUARDANDO_EMAIL);
         }
         else if (data.equals("FINALIZAR_"))
         {
+
             mensagemEmailForceReply(chatId);
+            estadosUsuario.put(chatId, EstadoUsuario.AGUARDANDO_EMAIL);
         }
         else if (data.equals("AJUDA"))
         {
@@ -140,7 +179,6 @@ public class Biketron3000 extends TelegramLongPollingBot
         {
             enviarMensagemSimples(chatId, "Opção desconhecida.");
         }
-
     }
 
      // =============================
@@ -193,6 +231,34 @@ public class Biketron3000 extends TelegramLongPollingBot
   // =============================
  //  Menus e mensagens
 // =============================
+
+    private void enviarMenuPagamentoComLinks(Long chatId, String linkMercadoPago, String linkPicPay)
+    {
+        SendMessage mensagem = new SendMessage();
+        mensagem.setChatId(chatId.toString());
+        mensagem.setText("Escolha a plataforma de pagamento:");
+
+        InlineKeyboardButton botaoMercadoPago = new InlineKeyboardButton();
+        botaoMercadoPago.setText("💳 Pagar com Mercado Pago");
+        botaoMercadoPago.setUrl(linkMercadoPago);
+
+        InlineKeyboardButton botaoPicPay = new InlineKeyboardButton();
+        botaoPicPay.setText("💳 Pagar com PicPay");
+        botaoPicPay.setUrl(linkPicPay);
+
+        List<List<InlineKeyboardButton>> linhas = List.of(
+                List.of(botaoMercadoPago),
+                List.of(botaoPicPay)
+        );
+
+        InlineKeyboardMarkup teclado = new InlineKeyboardMarkup();
+        teclado.setKeyboard(linhas);
+
+        mensagem.setReplyMarkup(teclado);
+
+        enviarMensagem(mensagem);
+    }
+
     private InlineKeyboardMarkup menuFinalizarSelecao()
     {
        InlineKeyboardButton finalizarSelecao = new InlineKeyboardButton();
