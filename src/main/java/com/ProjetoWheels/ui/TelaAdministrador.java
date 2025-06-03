@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 public class TelaAdministrador extends JFrame
 {
     private JTable tabela;
-    private DefaultTableModel modelo;
-    private List<Bikes> bikes = new ArrayList<>();
+    private static DefaultTableModel modelo;
+    private static List<Bikes> bikes = new ArrayList<>();
     private JTextField campoBusca;
 
     public  TelaAdministrador()
@@ -119,13 +119,13 @@ public class TelaAdministrador extends JFrame
         });
     }
 
-    private void atualizarTabela()
+    public static void atualizarTabela()
     {
         bikes = BikesDAO.listarBikes();
         preencherTabela(bikes);
     }
 
-    private void preencherTabela(List<Bikes> lista)
+    private static void preencherTabela(List<Bikes> lista)
     {
         modelo.setRowCount(0);
         for (Bikes b : lista)
