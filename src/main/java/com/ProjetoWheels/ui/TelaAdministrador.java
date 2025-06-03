@@ -43,7 +43,7 @@ public class TelaAdministrador extends JFrame
 
         add(painelBusca, BorderLayout.NORTH);
 
-        String[] colunas = {"ID", "Modelo", "Cor", "Tipo", "Status"};
+        String[] colunas = {"Modelo", "Cor", "Tipo", "Status"};
         modelo = new DefaultTableModel(colunas, 0);
         tabela = new JTable(modelo);
         add(new JScrollPane(tabela),BorderLayout.CENTER);
@@ -63,10 +63,28 @@ public class TelaAdministrador extends JFrame
             telaEdicao.setVisible(true);
         });
 
+        JButton botaoDeletar = new JButton("Deletar");
+
         JPanel painelBotoesSouth = new JPanel();
         painelBotoesSouth.add(botaoAdicionar);
         painelBotoesSouth.add(botaoEditar);
+        painelBotoesSouth.add(botaoDeletar);
         add(painelBotoesSouth,BorderLayout.SOUTH);
+
+        tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        modelo.addTableModelListener(e -> {
+            int row = e.getFirstRow();
+            int column = e.getColumn();
+
+            // Evita erro se for evento de estrutura ou exclusão de linha
+            if (row < 0 || column < 0) return;
+
+            Object novoValor = modelo.getValueAt(row, column);
+            int id = (int) modelo.getValueAt(row, 0); // Supondo que a coluna 0 seja o ID
+
+            BikesDAO.atualizarBikeNoBanco(id, column, novoValor);
+        });
     }
 
     private void atualizarTabela()
@@ -81,7 +99,6 @@ public class TelaAdministrador extends JFrame
         for (Bikes b : lista)
         {
             modelo.addRow(new Object[]{
-                    b.getId(),
                     b.getModelo(),
                     b.getCor(),
                     b.getClass().getSimpleName(),

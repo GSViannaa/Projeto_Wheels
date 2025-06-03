@@ -7,6 +7,7 @@ import com.ProjetoWheels.enums.bikes.TemRodinhas;
 import com.ProjetoWheels.enums.bikes.TipoPneu;
 import com.ProjetoWheels.model.*;
 
+import javax.swing.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -186,10 +187,37 @@ public class BikesDAO {
              }
 
              return listaBikes;
-
         }
+    public static boolean atualizarCampo(int id, String campo, String valor) {
+        String sql = "UPDATE bikes SET " + campo + " = ? WHERE id = ?";
 
-
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql))
+        {
+            stmt.setString(1, valor);
+            stmt.setInt(2, id);
+            stmt.executeUpdate();
+            return true;
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+            return false;
+        }
     }
+    public static void atualizarBikeNoBanco(int id, int column, Object novoValor)
+    {
+        String nomeColuna = switch (column)
+        {
+            case 1 -> "modelo";
+            case 2 -> "cor";
+            case 4 -> "status"; // supondo que 4 é o statusDisponibilidade
+            default -> null;
+        };
+        if (nomeColuna == null) return;
+
+        boolean sucesso = BikesDAO.atualizarCampo(id, nomeColuna, novoValor.toString());
+    }
+}
 
 

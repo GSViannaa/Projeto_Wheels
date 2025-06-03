@@ -36,17 +36,23 @@ public class CadastroBikes extends JDialog
         form.setLayout(new BoxLayout(form, BoxLayout.Y_AXIS));
         form.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        JPanel corPanel = new JPanel(new BorderLayout());
-        corPanel.add(new JLabel("Cor:"), BorderLayout.NORTH);
+        JPanel corPanel = new JPanel();
+        corPanel.setLayout(new BoxLayout(corPanel, BoxLayout.Y_AXIS));
+        corPanel.add(new JLabel("Cor:"));
+
         campoCor = new JTextField(20);
-        corPanel.add(campoCor, BorderLayout.CENTER);
+        campoCor.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+        corPanel.add(campoCor);
         form.add(corPanel);
         form.add(Box.createVerticalStrut(15));
 
-        JPanel modeloPanel = new JPanel(new BorderLayout());
-        modeloPanel.add(new JLabel("Modelo:"), BorderLayout.NORTH);
+        JPanel modeloPanel = new JPanel();
+        modeloPanel.setLayout(new BoxLayout(modeloPanel, BoxLayout.Y_AXIS));
+        modeloPanel.add(new JLabel("Modelo:"));
+
         campoModelo = new JTextField(20);
-        modeloPanel.add(campoModelo, BorderLayout.CENTER);
+        campoModelo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+        modeloPanel.add(campoModelo);
         form.add(modeloPanel);
         form.add(Box.createVerticalStrut(15));
 
