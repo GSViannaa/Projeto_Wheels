@@ -36,15 +36,6 @@ public class CadastroBikes extends JDialog
         form.setLayout(new BoxLayout(form, BoxLayout.Y_AXIS));
         form.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        JPanel corPanel = new JPanel();
-        corPanel.setLayout(new BoxLayout(corPanel, BoxLayout.Y_AXIS));
-        corPanel.add(new JLabel("Cor:"));
-
-        campoCor = new JTextField(20);
-        campoCor.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
-        corPanel.add(campoCor);
-        form.add(corPanel);
-        form.add(Box.createVerticalStrut(15));
 
         JPanel modeloPanel = new JPanel();
         modeloPanel.setLayout(new BoxLayout(modeloPanel, BoxLayout.Y_AXIS));
@@ -54,6 +45,16 @@ public class CadastroBikes extends JDialog
         campoModelo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
         modeloPanel.add(campoModelo);
         form.add(modeloPanel);
+        form.add(Box.createVerticalStrut(15));
+
+        JPanel corPanel = new JPanel();
+        corPanel.setLayout(new BoxLayout(corPanel, BoxLayout.Y_AXIS));
+        corPanel.add(new JLabel("Cor:"));
+
+        campoCor = new JTextField(20);
+        campoCor.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+        corPanel.add(campoCor);
+        form.add(corPanel);
         form.add(Box.createVerticalStrut(15));
 
         JPanel tipoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -92,7 +93,10 @@ public class CadastroBikes extends JDialog
         radioDefault.addActionListener(e -> atualizarExtras());
 
         JButton salvar = new JButton("Salvar");
-        salvar.addActionListener(e -> salvarBicicleta());
+        salvar.addActionListener(e -> {
+            salvarBicicleta();
+            TelaAdministrador.atualizarTabela();
+        });
 
         JPanel botaoPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         botaoPanel.add(salvar);
