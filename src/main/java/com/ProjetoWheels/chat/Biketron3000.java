@@ -3,6 +3,7 @@ import com.ProjetoWheels.DAO.BikesDAO;
 import com.ProjetoWheels.enums.usuarios.EstadoUsuario;
 import com.ProjetoWheels.model.Bikes;
 import com.ProjetoWheels.service.AluguelService;
+import com.ProjetoWheels.service.ValidacaoService;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -36,14 +37,21 @@ public class Biketron3000 extends TelegramLongPollingBot
     @Override
     public void onUpdateReceived(Update update)
     {
-        if (update.hasMessage())
+        if (update.hasMessage() && !servicoVerificarEstado())
         {
             processarMensagemDeTexto(update.getMessage());
         }
 
         if (update.hasCallbackQuery())
         {
-            processarCallback(update.getCallbackQuery());
+            try
+            {
+                processarCallback(update.getCallbackQuery());
+            }
+            catch (TelegramApiException e)
+            {
+                throw new RuntimeException(e);
+            }
         }
     }
       // =============================
@@ -61,10 +69,12 @@ public class Biketron3000 extends TelegramLongPollingBot
     //  Processamento  callback
    // =============================
 
-    private void processarCallback(CallbackQuery callbackQuery)
+    private void processarCallback(CallbackQuery callbackQuery) throws TelegramApiException
     {
+
         String data = callbackQuery.getData();
         Long chatId = callbackQuery.getMessage().getChatId();
+
 
         if (data.equals("ESCOLHER_TIPO"))
         {
@@ -101,12 +111,24 @@ public class Biketron3000 extends TelegramLongPollingBot
             String textoResumo = mensagemResumoAluguel(chatId, data);
             InlineKeyboardMarkup teclado = menuFinalizarSelecao();
 
+            String email = callbackQuery.getMessage().toString();
+
+            boolean aa = ValidacaoService.isValidEmail(email);
+
+            System.out.println(aa);
+
             SendMessage mensagem = new SendMessage();
             mensagem.setChatId(chatId.toString());
             mensagem.setReplyMarkup(teclado);
             mensagem.setText(textoResumo);
             enviarMensagem(mensagem);
 
+            estadosUsuario.put(chatId, EstadoUsuario.AGUARDANDO_EMAIL);
+
+        }
+        else if (data.equals("FINALIZAR_"))
+        {
+            mensagemEmailForceReply(chatId);
         }
         else if (data.equals("AJUDA"))
         {
@@ -485,17 +507,20 @@ public class Biketron3000 extends TelegramLongPollingBot
         return AluguelService.calcularTotal( bikesSelecionadas, diasString);
     }
 
-
     public void mensagemEmailForceReply(long chatId) throws TelegramApiException
     {
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
-        message.setText("Por favor, envie seu e-mail:");
+        message.setText("Agora, envie seu e-mail:");
         ForceReplyKeyboard forceReply = new ForceReplyKeyboard();
         forceReply.setForceReply(true);
         message.setReplyMarkup(forceReply);
         execute(message);
     }
 
+    public boolean servicoVerificarEstado()
+    {
+      return estadosUsuario.containsValue(EstadoUsuario.AGUARDANDO_EMAIL);
+    }
 }
 

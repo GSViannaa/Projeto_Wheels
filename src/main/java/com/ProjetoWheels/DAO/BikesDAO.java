@@ -233,6 +233,13 @@ public class BikesDAO {
 
         boolean sucesso = BikesDAO.atualizarCampo(id, nomeColuna, novoValor.toString());
     }
+    public static void mudarDisponibilidade(List<Bikes> bikes)
+    {
+        for (Bikes b : bikes)
+        {
+            b.setStatusDisponibilidade(StatusBikes.ALUGADA);
+        }
+    }
 }
 
 
