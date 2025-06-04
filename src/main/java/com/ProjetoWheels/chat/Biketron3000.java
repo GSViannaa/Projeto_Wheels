@@ -207,7 +207,7 @@ public class Biketron3000 extends TelegramLongPollingBot
         mensagem.setText(textoMensagem);
         mensagem.enableMarkdown(true);
 
-        InlineKeyboardMarkup teclado = menuReumoDaBike(modelo, cor, tipoDaBike);
+        InlineKeyboardMarkup teclado = menuResumoDaBike(modelo, cor, tipoDaBike);
         mensagem.setReplyMarkup(teclado);
 
         enviarMensagem(mensagem);
@@ -376,7 +376,7 @@ public class Biketron3000 extends TelegramLongPollingBot
         return teclado;
     }
 
-    private InlineKeyboardMarkup menuReumoDaBike(String modelo, String cor, String tipo)
+    private InlineKeyboardMarkup menuResumoDaBike(String modelo, String cor, String tipo)
     {
         InlineKeyboardButton botaoConfirmar = new InlineKeyboardButton();
         botaoConfirmar.setText("Confirmar " + modelo + " na cor " + cor);
