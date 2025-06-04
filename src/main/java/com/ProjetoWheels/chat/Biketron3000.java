@@ -598,5 +598,7 @@ public class Biketron3000 extends TelegramLongPollingBot
     {
         return ReciboService.gerarPDF(builderMensagemResumo(chatId, data));
     }
+
+
 }
 
