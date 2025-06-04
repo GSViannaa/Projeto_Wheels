@@ -597,5 +597,7 @@ public class Biketron3000 extends TelegramLongPollingBot
         texto.append("Valor Total: R$").append(servicoCalcularPrecoTotal(data,bikes));
         return texto;
     }
+
+
 }
 
