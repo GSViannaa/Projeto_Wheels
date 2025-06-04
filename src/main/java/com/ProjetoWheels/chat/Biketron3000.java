@@ -80,6 +80,8 @@ public class Biketron3000 extends TelegramLongPollingBot
 
                 if (valido)
                 {
+
+
                     enviarMensagemSimples(chatId, "✅ Email válido! Agora escolha a forma de pagamento:");
 
                     String linkMercadoPago = "https://www.mercadopago.com/checkout/v1/redirect?pref_id=SUA_PREFERENCIA";
@@ -240,16 +242,15 @@ public class Biketron3000 extends TelegramLongPollingBot
 
         InlineKeyboardButton botaoMercadoPago = new InlineKeyboardButton();
         botaoMercadoPago.setText("💳 Pagar com Mercado Pago");
+        botaoMercadoPago.setCallbackData("PAGO_MERCADO");
         botaoMercadoPago.setUrl(linkMercadoPago);
 
         InlineKeyboardButton botaoPicPay = new InlineKeyboardButton();
         botaoPicPay.setText("💳 Pagar com PicPay");
+        botaoPicPay.setCallbackData("PAGO_PICPAY");
         botaoPicPay.setUrl(linkPicPay);
 
-        List<List<InlineKeyboardButton>> linhas = List.of(
-                List.of(botaoMercadoPago),
-                List.of(botaoPicPay)
-        );
+        List<List<InlineKeyboardButton>> linhas = List.of(List.of(botaoMercadoPago), List.of(botaoPicPay));
 
         InlineKeyboardMarkup teclado = new InlineKeyboardMarkup();
         teclado.setKeyboard(linhas);
@@ -279,29 +280,13 @@ public class Biketron3000 extends TelegramLongPollingBot
     private String mensagemResumoAluguel(Long chatId, String data)
 
     {
-        List<Bikes> bikes = modelosEscolhidosPorUsuario.get(chatId);
-
-        String diasString = data.replace("ESCOLHER_DIAS_", "");
-
-        StringBuilder texto = new StringBuilder("Você escolheu estas bicicletas:\n\n");
-
-        for (Bikes b : bikes)
-        {
-            texto.append("• ").append(b.getModelo()).append(" na cor ").append(b.getCor()).append("\n");
-            texto.append("- " + "Valor do dia: R$").append(b.calcularPreco()).append("\n");
-            texto.append("- ").append("Quantidade de dias: ").append(diasString).append("\n");
-
-            double total = servicoCalcularPrecoIndividual(data, b);
-
-            texto.append("- ").append("Valor: R$").append(total).append("\n\n");
-        }
-
-        texto.append("Valor de seguro: R$50").append("\n");
-        texto.append("Valor Total: R$").append(servicoCalcularPrecoTotal(data,bikes));
+        StringBuilder texto = builderMensagemResumo(chatId, data);
 
         return texto.toString();
     }
-     private void mensagemEscolherDuracaoOuMaisBike(Long chatId, String modelo, String cor)
+
+
+    private void mensagemEscolherDuracaoOuMaisBike(Long chatId, String modelo, String cor)
      {
       SendMessage mensagem = new SendMessage();
       mensagem.setChatId(chatId.toString());
@@ -587,6 +572,30 @@ public class Biketron3000 extends TelegramLongPollingBot
     public boolean servicoVerificarEstado()
     {
       return estadosUsuario.containsValue(EstadoUsuario.AGUARDANDO_EMAIL);
+    }
+    private StringBuilder builderMensagemResumo(Long chatId, String data)
+    {
+
+        List<Bikes> bikes = modelosEscolhidosPorUsuario.get(chatId);
+
+        String diasString = data.replace("ESCOLHER_DIAS_", "");
+
+        StringBuilder texto = new StringBuilder("Você escolheu estas bicicletas:\n\n");
+
+        for (Bikes b : bikes)
+        {
+            texto.append("• ").append(b.getModelo()).append(" na cor ").append(b.getCor()).append("\n");
+            texto.append("- " + "Valor do dia: R$").append(b.calcularPreco()).append("\n");
+            texto.append("- ").append("Quantidade de dias: ").append(diasString).append("\n");
+
+            double total = servicoCalcularPrecoIndividual(data, b);
+
+            texto.append("- ").append("Valor: R$").append(total).append("\n\n");
+        }
+
+        texto.append("Valor de seguro: R$50").append("\n");
+        texto.append("Valor Total: R$").append(servicoCalcularPrecoTotal(data,bikes));
+        return texto;
     }
 }
 
