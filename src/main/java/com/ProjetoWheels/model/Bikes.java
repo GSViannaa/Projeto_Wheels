@@ -12,6 +12,7 @@ public abstract class Bikes
     protected String modelo;
     protected String cor;
     protected StatusBikes statusDisponibilidade = StatusBikes.DISPONIVEL;
+    protected double preco;
 
     public Bikes(String modelo, String cor)
     {

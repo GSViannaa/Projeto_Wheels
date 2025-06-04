@@ -12,13 +12,15 @@ import java.io.IOException;
 public class ReciboService
 {
 
-    public static Document gerarPDF(String texto)
+    public static String gerarPDF(String texto)
     {
+        String caminho = "Recibo.pdf";
+
         Document document = new Document();
 
         try
         {
-            PdfWriter.getInstance(document, new FileOutputStream("exemplo.pdf"));
+            PdfWriter.getInstance(document, new FileOutputStream(caminho));
             document.open();
             document.add(new Paragraph(texto));
         }
@@ -30,6 +32,7 @@ public class ReciboService
         {
             document.close();
         }
-        return document;
+
+        return caminho;
     }
 }

@@ -12,11 +12,14 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BikesDAO {
+import static com.ProjetoWheels.database.Conexao.getConnection;
+
+public class BikesDAO
+{
     public static void salvarNoBancoDeDados(Bikes b) {
         String sql = "INSERT INTO Bikes (modelo, cor, tipo, status, atributos_especificos) VALUES (?, ?, ?, ?, ?)";
 
-        try (Connection conexao = Conexao.getConnection();
+        try (Connection conexao = getConnection();
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
             stmt.setString(1, b.getModelo());
             stmt.setString(2, b.getCor());
@@ -43,7 +46,7 @@ public class BikesDAO {
     public static boolean deletarBike(int id) {
         String sql = "DELETE FROM bikes WHERE id = ?";
 
-        try (Connection conn = Conexao.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
@@ -61,7 +64,7 @@ public class BikesDAO {
 
         String sql = "SELECT * FROM bikes";
 
-        try (Connection conn = Conexao.getConnection();
+        try (Connection conn = getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -104,7 +107,7 @@ public class BikesDAO {
 
         String sql = "SELECT * FROM bikes WHERE tipo = ?";
 
-        try (Connection conn = Conexao.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
         ) {
             stmt.setString(1, tipo);
@@ -154,7 +157,7 @@ public class BikesDAO {
         List<Bikes> listaBikes = new ArrayList<>();
         String sql = "SELECT * FROM bikes WHERE modelo = ? and status= ? ";
 
-        try (Connection conexao = Conexao.getConnection();
+        try (Connection conexao = getConnection();
              PreparedStatement stmt = conexao.prepareStatement(sql))
         {
             stmt.setString(1, modelo);
@@ -206,7 +209,7 @@ public class BikesDAO {
     public static boolean atualizarCampo(int id, String campo, String valor) {
         String sql = "UPDATE bikes SET " + campo + " = ? WHERE id = ?";
 
-        try (Connection conn = Conexao.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql))
         {
             stmt.setString(1, valor);
@@ -240,6 +243,29 @@ public class BikesDAO {
             b.setStatusDisponibilidade(StatusBikes.ALUGADA);
         }
     }
+    public static List<String> listarBikesPorTipo(String tipo)
+    {
+        List<String> modelos = new ArrayList<>();
+        String sql = "SELECT modelo FROM bikes WHERE tipo = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql))
+        {
+            ps.setString(1, tipo);
+            try (ResultSet rs = ps.executeQuery())
+            {
+                while (rs.next())
+                {
+                    modelos.add(rs.getString("modelo"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return modelos;
+    }
+
+
 }
 
 

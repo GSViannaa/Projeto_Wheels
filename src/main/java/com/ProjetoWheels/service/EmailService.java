@@ -3,8 +3,12 @@ package com.ProjetoWheels.service;
 import com.lowagie.text.Document;
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Properties;
 
 public class EmailService
@@ -12,7 +16,7 @@ public class EmailService
     private final String user = "biketronn3000@gmail.com";
     private final String password = "chvppvlylwfinkxh";
 
-    public void enviarEmail(String para, String assunto, Document corpo)
+    public void enviarEmail(String para, String assunto, String caminhoDoArquivoPdf)
     {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
@@ -39,12 +43,24 @@ public class EmailService
             );
             message.setSubject(assunto);
 
+            MimeBodyPart textoPart = new MimeBodyPart();
+            textoPart.setText("Segue em anexo o recibo do seu aluguel.");
+
+            MimeBodyPart anexoPart = new MimeBodyPart();
+            anexoPart.attachFile(new File(caminhoDoArquivoPdf));
+
+            Multipart multipart = new MimeMultipart();
+            multipart.addBodyPart(textoPart);
+            multipart.addBodyPart(anexoPart);
+
+            message.setContent(multipart);
+
             Transport.send(message);
 
             System.out.println("E-mail enviado com sucesso!");
 
         }
-        catch (MessagingException e)
+        catch (MessagingException | IOException e)
         {
             e.printStackTrace();
         }
