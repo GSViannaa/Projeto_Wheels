@@ -80,6 +80,8 @@ public class Biketron3000 extends TelegramLongPollingBot
 
                 if (valido)
                 {
+
+
                     enviarMensagemSimples(chatId, "✅ Email válido! Agora escolha a forma de pagamento:");
 
                     String linkMercadoPago = "https://www.mercadopago.com/checkout/v1/redirect?pref_id=SUA_PREFERENCIA";
@@ -240,16 +242,15 @@ public class Biketron3000 extends TelegramLongPollingBot
 
         InlineKeyboardButton botaoMercadoPago = new InlineKeyboardButton();
         botaoMercadoPago.setText("💳 Pagar com Mercado Pago");
+        botaoMercadoPago.setCallbackData("PAGO_MERCADO");
         botaoMercadoPago.setUrl(linkMercadoPago);
 
         InlineKeyboardButton botaoPicPay = new InlineKeyboardButton();
         botaoPicPay.setText("💳 Pagar com PicPay");
+        botaoPicPay.setCallbackData("PAGO_PICPAY");
         botaoPicPay.setUrl(linkPicPay);
 
-        List<List<InlineKeyboardButton>> linhas = List.of(
-                List.of(botaoMercadoPago),
-                List.of(botaoPicPay)
-        );
+        List<List<InlineKeyboardButton>> linhas = List.of(List.of(botaoMercadoPago), List.of(botaoPicPay));
 
         InlineKeyboardMarkup teclado = new InlineKeyboardMarkup();
         teclado.setKeyboard(linhas);

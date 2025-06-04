@@ -1,6 +1,7 @@
 package com.ProjetoWheels.enums.usuarios;
 
-public enum EstadoUsuario {
+public enum EstadoUsuario
+{
 
     MENU_PRINCIPAL,
     ESCOLHENDO_TIPO,

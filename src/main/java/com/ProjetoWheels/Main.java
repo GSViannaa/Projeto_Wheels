@@ -5,6 +5,7 @@ import com.ProjetoWheels.DAO.PopularTabelaDAO;
 import com.ProjetoWheels.chat.Biketron3000;
 import com.ProjetoWheels.database.DataBaseSetup;
 import com.ProjetoWheels.model.SpeedBikes;
+import com.ProjetoWheels.service.EmailService;
 import com.ProjetoWheels.ui.TelaAdministrador;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -16,6 +17,9 @@ public class Main {
 
     public static void main(String[] args) throws TelegramApiException
     {
+        EmailService service = new EmailService();
+        service.enviarEmail("bernardo.cytryn@al.infnet.edu.br", "Olá", "Teste de envio de e-mail!");
+
         DataBaseSetup.criarTabelas();
         //PopularTabelaDAO.popularTabela();
 
