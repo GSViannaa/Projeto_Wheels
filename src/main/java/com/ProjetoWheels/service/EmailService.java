@@ -1,5 +1,6 @@
 package com.ProjetoWheels.service;
 
+import com.lowagie.text.Document;
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
@@ -11,7 +12,7 @@ public class EmailService
     private final String user = "biketronn3000@gmail.com";
     private final String password = "chvppvlylwfinkxh";
 
-    public void enviarEmail(String para, String assunto, String corpo)
+    public void enviarEmail(String para, String assunto, Document corpo)
     {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
@@ -37,7 +38,6 @@ public class EmailService
                     InternetAddress.parse(para)
             );
             message.setSubject(assunto);
-            message.setText(corpo);
 
             Transport.send(message);
 

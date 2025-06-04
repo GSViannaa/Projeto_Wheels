@@ -17,9 +17,6 @@ public class Main {
 
     public static void main(String[] args) throws TelegramApiException
     {
-        EmailService service = new EmailService();
-        service.enviarEmail("bernardo.cytryn@al.infnet.edu.br", "Olá", "Teste de envio de e-mail!");
-
         DataBaseSetup.criarTabelas();
         //PopularTabelaDAO.popularTabela();
 

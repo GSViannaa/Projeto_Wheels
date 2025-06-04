@@ -3,7 +3,10 @@ import com.ProjetoWheels.DAO.BikesDAO;
 import com.ProjetoWheels.enums.usuarios.EstadoUsuario;
 import com.ProjetoWheels.model.Bikes;
 import com.ProjetoWheels.service.AluguelService;
+import com.ProjetoWheels.service.EmailService;
+import com.ProjetoWheels.service.ReciboService;
 import com.ProjetoWheels.service.ValidacaoService;
+import com.lowagie.text.Document;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -41,7 +44,6 @@ public class Biketron3000 extends TelegramLongPollingBot
         {
             processarMensagemDeTexto(update.getMessage());
         }
-
         if (update.hasCallbackQuery())
         {
             try
@@ -80,8 +82,6 @@ public class Biketron3000 extends TelegramLongPollingBot
 
                 if (valido)
                 {
-
-
                     enviarMensagemSimples(chatId, "✅ Email válido! Agora escolha a forma de pagamento:");
 
                     String linkMercadoPago = "https://www.mercadopago.com/checkout/v1/redirect?pref_id=SUA_PREFERENCIA";
@@ -147,12 +147,11 @@ public class Biketron3000 extends TelegramLongPollingBot
         }
         else if (data.startsWith("ESCOLHER_DURACAO_"))
         {
-            mensagemEscolhaDeDias(chatId);
+
             estadosUsuario.put(chatId, EstadoUsuario.ESCOLHANDO_DIAS);
         }
         else if (data.startsWith("ESCOLHER_DIAS_"))
         {
-
             String textoResumo = mensagemResumoAluguel(chatId, data);
             InlineKeyboardMarkup teclado = menuFinalizarSelecao();
 
@@ -162,20 +161,21 @@ public class Biketron3000 extends TelegramLongPollingBot
             mensagem.setText(textoResumo);
             enviarMensagem(mensagem);
 
-
             estadosUsuario.put(chatId, EstadoUsuario.AGUARDANDO_EMAIL);
         }
         else if (data.equals("FINALIZAR_"))
         {
-
             mensagemEmailForceReply(chatId);
             estadosUsuario.put(chatId, EstadoUsuario.AGUARDANDO_EMAIL);
         }
         else if (data.equals("AJUDA"))
         {
+            mensagemEscolhaDeDias(chatId);
+            var asd = merda(chatId, data);
+            EmailService service = new EmailService();
+            service.enviarEmail("bernardo.cytryn@al.infnet.edu.br", "Olá", asd);
             String respostaAjuda = gerarMensagemAjuda();
             enviarMensagemSimples(chatId, respostaAjuda);
-
         }
         else
         {
@@ -278,11 +278,9 @@ public class Biketron3000 extends TelegramLongPollingBot
         return teclado;
     }
     private String mensagemResumoAluguel(Long chatId, String data)
-
     {
-        StringBuilder texto = builderMensagemResumo(chatId, data);
-
-        return texto.toString();
+        String texto = builderMensagemResumo(chatId, data);
+        return texto;
     }
 
 
@@ -573,7 +571,7 @@ public class Biketron3000 extends TelegramLongPollingBot
     {
       return estadosUsuario.containsValue(EstadoUsuario.AGUARDANDO_EMAIL);
     }
-    private StringBuilder builderMensagemResumo(Long chatId, String data)
+    private String builderMensagemResumo(Long chatId, String data)
     {
 
         List<Bikes> bikes = modelosEscolhidosPorUsuario.get(chatId);
@@ -592,10 +590,13 @@ public class Biketron3000 extends TelegramLongPollingBot
 
             texto.append("- ").append("Valor: R$").append(total).append("\n\n");
         }
-
         texto.append("Valor de seguro: R$50").append("\n");
         texto.append("Valor Total: R$").append(servicoCalcularPrecoTotal(data,bikes));
-        return texto;
+        return texto.toString();
+    }
+    public Document merda(Long chatId, String data)
+    {
+        return ReciboService.gerarPDF(builderMensagemResumo(chatId, data));
     }
 }
 
